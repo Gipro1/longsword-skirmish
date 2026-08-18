@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Longsword Skirmish</title>
+
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    
+        <link href="assets/longsword.css" rel="stylesheet">
+        <script src="assets/longsword.js" defer></script>
+    </head>
+
+    <body class="container-fluid d-flex flex-column min-vh-100">
+        <h1 class="text-center"><img width="36px" src="https://images.steamusercontent.com/ugc/52448099175874608/178145990D752513EC66CCF3872287FAF97A077D/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false" alt="UNSC"/>Longsword Skirmish &Omega;</h1>
+        
+        <svg id="mySVG" class="m-auto d-block" width="1000" height="500">
+            <g id="rocket" transform="translate(465,430)">
+                <polygon id="nose" points="31,5,34,-7,36,-7,39,5" fill="lightgrey"></polygon>
+                <polygon id="screen" points="33,1,34,-4,36,-4,37,1" fill="grey"></polygon>
+                <rect id="trunkLeft" x="30" y="3" width="5" height="17" fill="lightgrey" stroke="grey" stroke-width="0.7"></rect>
+                <rect id="trunkRight" x="35" y="3" width="5" height="17" fill="lightgrey" stroke="grey" stroke-width="0.7"></rect>
+                <polygon id="mid" points="30,20,40,20,37,35,33,35" fill="darkgrey" stroke="grey"></polygon>
+                <rect id="leftCanon" x="20" y="4" width="3" height="10" fill="grey"></rect>
+                <polygon id="leftWing" points="30,2,27,2,0,20,0,25,30,35" fill="lightgrey"></polygon>
+                <rect id="leftEngine" x="17" y="18" width="8" height="20" fill="lightgrey" stroke="grey"></rect>            
+                <polygon id="flameLeft" fill="orange" points="19,38,21,45,23,38"></polygon>
+                <rect id="rightCanon" x="47" y="4" width="3" height="10" fill="grey"></rect>
+                <polygon id="rightWing" points="40,2,43,2,70,20,70,25,40,35" fill="lightgrey"></polygon>
+                <rect id="rightEngine" x="45" y="18" width="8" height="20" fill="lightgrey" stroke="grey"></rect>
+                <polygon id="flameRight" fill="orange" points="47,38,49,45,51,38"></polygon>
+                <polygon id="tail" points="34,35,36,35,36,55,35,65,34,55" fill="lightgrey"></polygon>
+            </g>
+
+            <g id="banshee" transform="translate(470,-50)">
+                <rect id="middleBack" x="21" y="0" width="13" height="35" ry="30" fill="indigo"></rect>
+                <rect id="middleFront" x="20" y="15" width="15" height="25" ry="10" fill="indigo"></rect>
+                <polyline id="leftTrail" points="0,15,0,-50" stroke-width="1" stroke="lightblue"></polyline>
+                <polyline id="leftJet" points="23,10,0,15,0,13,0,19,0,17,21,28" fill="none" stroke-width="2" stroke="indigo"></polyline>
+                <polyline id="rightTrail" points="55,15,55,-50" fill="white" stroke-width="1" stroke="lightblue"></polyline>
+                <polyline id="rightJet" points="32,10,55,15,55,13,55,19,55,17,34,28" fill="none" stroke-width="2" stroke="indigo"></polyline>
+            </g>
+        </svg>
+        <br>    
+        <div id="controls">
+            <button class="m-auto d-block bg-danger px-2 w-25" id="btn">Start</button>
+        </div>
+
+        <footer class="mt-auto py-3">
+            <hr class="text-white m-0">
+            <p class="text-white text-center m-0 pt-2">Angelo Scala &copy; 2026</p>
+        </footer>
+    </body>
+</html>
