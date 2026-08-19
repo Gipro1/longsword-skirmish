@@ -461,8 +461,9 @@ function powerUp() {
     let drift;
     let powerNodeSpawner = setInterval(()=>{
         let powerNode = document.createElementNS(svgNS, "circle");
+        let nodeX = randomXSpawn();
 
-        powerNode.setAttribute("cx", `${randomXSpawn()}`);
+        powerNode.setAttribute("cx", `${nodeX}`);
         powerNode.setAttribute("cy", ySpawn);
         powerNode.setAttribute("r", "5");
         powerNode.setAttribute("fill", "yellow");
@@ -474,6 +475,10 @@ function powerUp() {
         drift = setInterval(()=>{
             powerNode.setAttribute("cy", yDrift);
             yDrift++;
+            if (collectPower(nodeX, yDrift)) {
+                powerNode.remove();
+                clearInterval(drift);
+            }
             if (yDrift > 550) {
                 powerNode.remove();
                 clearInterval(drift);
@@ -487,6 +492,13 @@ function powerUp() {
  * - 
  * 
  */
-function collectPower() {
-    
+function collectPower(nodeX, yDrift) {
+    let pickUpX = ( nodeX < x + 70) && (nodeX + 10 > x);
+    let pickUpY = (yDrift < y + 65) && (yDrift + 10 > y);
+
+    if (pickUpX && pickUpY) {
+        missileDamage *= 3;
+        return true;
+    }
+    return false;
 }
