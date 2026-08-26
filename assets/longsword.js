@@ -1,42 +1,48 @@
-/*
-@author: Angelo Scala
-I made this.
-*/
+/**
+ * - Initiates game after start button clicked: game is set true
+ * - Intro sequence plays and calls enemy spawner()
+ * - Longsword controls become active, can be moved and fires missiles
+ * - Tracks longsword hp
+ * 
+ * @author: Angelo Scala
+ */
 
 
-let svgNS = "http://www.w3.org/2000/svg";
-let svg = document.getElementById("mySVG");
-let btn = document.getElementById("btn");
-let controls = document.getElementById("controls");
+import { game, setGame } from "./main.js";
+import { collectPower } from "./collision.js";
+import { banshees, spawner, takeDowns, passedThrough } from "./banshees.js";
+import { powerUp } from "./items.js";
+
+const svgNS = "http://www.w3.org/2000/svg";
+export const svg = document.getElementById("mySVG");
+const controls = document.getElementById("controls");
+const endStats = document.getElementById("endStats");
+
 let gameTime = 0.0; // Tracks time spent playing
-
 let gameTimer; // Timing interval
-
+let gameVictory = false;
 
 // Longsword
-let rocket = document.getElementById("rocket");
-let flameLeft = document.getElementById("flameLeft");
-let flameRight = document.getElementById("flameRight");
-let hp = 100;
-let missileDamage = 10;
-let takeDowns = 0
-let passedThrough = 0;
+const rocket = document.getElementById("rocket");
+const flameLeft = document.getElementById("flameLeft");
+const flameRight = document.getElementById("flameRight");
+export const stats = {
+    hp: 100,
+    missileDamage: 10
+};
 
-// Banshee
-let banshee = document.getElementById("banshee");
 
-btn.addEventListener("click", startGame);
-let game = false;
-let gameState;
-let clock;
-let countDown;
+
+let controllable;
 /**
  * - Starts countdown which triggers game to start.
  * 
  */
-function startGame() {
+export function startGame(e) {
+    let clock;
+    let countDown;
     if (!game) {
-        game = true;
+        setGame(true);
         let loading;
         let dots = "";
         setTimeout(()=>{
@@ -71,27 +77,28 @@ function startGame() {
                 clock.remove();
                 intro();
                 clearInterval(countDown);
-                gameState = setInterval(controller, 16);
+                controllable = setInterval(controller, 16);
             }
             timer--;
             clock.innerHTML = timer;
         },1000);
     } else {
-        pauseGame(e);
+        //pauseGame(e);
+        console.log("fun");
     }
 }
 
 /**
  * - Not made yet
  * 
- */
+ *//*
 function pauseGame(e) {
 
-}
+}*/
 
 // default position
-let x = 465;
-let y = 430;
+export let x = 465;
+export let y = 430;
 let speed = 10;
 /**
  * - Longsword engines burn hotter
@@ -114,6 +121,11 @@ function intro() {
         spawner();
         gameTimer = setInterval(()=>{
             gameTime+=0.01;
+            if (gameTime >= 600.00) {
+                clearInterval(gameTimer);
+                gameVictory = true;
+                endGame();
+            }
         },10);
         
         powerUp();
@@ -126,200 +138,69 @@ let down = false;
 let left = false;
 let right = false;
 
-// Event Listener takes keydown inputs for directional booleans
-document.addEventListener("keyup", (e) => {
-    if (["ArrowUp", "w", "ArrowDown", "s", "ArrowLeft", "a", "ArrowRight", "d"].includes(e.key)) {
-        e.preventDefault();
-    }
-    if (e.key === "ArrowUp" || e.key === "w") { up = false; }
-    if (e.key === "ArrowDown" || e.key === "s") { down = false; }
-    if (e.key === "ArrowLeft" || e.key === "a") { left = false; }
-    if (e.key === "ArrowRight" || e.key === "d") { right = false; }
-});
-
-// Event Listener takes keyup inputs for directional booleans
-document.addEventListener("keydown", (e) => {
-    if (["ArrowUp", "w", "ArrowDown", "s", "ArrowLeft", "a", "ArrowRight", "d"].includes(e.key)) {
-        e.preventDefault();
-    }
-    if (e.key === "ArrowUp" || e.key === "w") { up = true; }
-    if (e.key === "ArrowDown" || e.key === "s") { down = true; }
-    if (e.key === "ArrowLeft" || e.key === "a") { left = true; }
-    if (e.key === "ArrowRight" || e.key === "d") { right = true; }
-});
+export function setDirection(key, pressed) {
+    if (["ArrowUp", "w"].includes(key)) { up = pressed; }
+    if (["ArrowDown", "s"].includes(key)) { down = pressed; }
+    if (["ArrowLeft", "a"].includes(key)) { left = pressed; }
+    if (["ArrowRight", "d"].includes(key)) { right = pressed; }
+}
 
 /**
  * - If game is active, increments or decrements x and y based on directional booleans
  * 
  */
-function controller() {
-    if (!game) {
-        return 
-    } else {
-        if (up) { 
-            if (y < +7) {
-                y = +7;
-            }
-            y -= speed; 
+export function controller() {
+    if (up) { 
+        if (y < +7) {
+            y = +7;
         }
-        if (down) { 
-            if (y > 450) {
-                y = 450;
-            }
-            y += speed; 
-        }
-        if (left) { 
-            if (x < 0) {
-                x = 0;
-            }
-            x -= speed; 
-        }
-        if (right) { 
-            if ( x > 930) {
-                x = 930;
-            }
-            x += speed; 
-        }
-        rocket.setAttribute("transform", `translate(${x},${y})`);
+        y -= speed;
     }
-}
-
-function randomXSpawn() {
-    return (Math.random() * 940)+5;
-}
-const ySpawn = -50;
-
-let banshees = [];
-let bansheeCount = 0;
-/**
- * - Clones original banshee svg group with randomX argument 
- * 
- */
-function bansheeSpawn(randomX,ySpawn) {
-    const newBanshee = banshee.cloneNode(true);
-    newBanshee.id = "banshee_" + bansheeCount;
-    bansheeCount++;
-    svg.appendChild(newBanshee);
-    return newBanshee;
-}
-
-/**
- * - Spawns banshees into game
- * - New banshees added to banshees array
- * - Banshees travel downwards and dissapear when off screen or if hp is drained to 0
- * - Banshees destroyed or passed boundary are removed from banshees array
- * 
- */
-function bansheeAction() {
-    let bansheeX = randomXSpawn();
-    let bansheeY = ySpawn;
-    let b = bansheeSpawn(bansheeX, bansheeY);
-    let bansheeXY = {x: bansheeX, y: bansheeY, index: bansheeCount, element: b, hp: 100, impact: false};
-    banshees.push(bansheeXY);
-    let bansheeApproach = setInterval(()=>{
-        bansheeY += 3;
-        b.setAttribute("transform", `translate(${bansheeX},${bansheeY})`);
-        bansheeXY.y = bansheeY;
-        collision();
-        if (bansheeY > 540) { // This block checks if banshee is passed viewport boundary
-            clearInterval(bansheeApproach);
-            b.remove();
-            for (let i = 0; i < banshees.length; i++) {
-                if (banshees[i].element === b) {
-                    banshees.splice(i,1);
-                    passedThrough++;
-                    break;
-                }
-            }
+    if (down) { 
+        if (y > 450) {
+            y = 450;
         }
-        if (bansheeXY.hp <= 0) { // This block checks if banshee hp is 0
-            clearInterval(bansheeApproach);
-            b.remove();
-            for (let i = 0; i < banshees.length; i++) {
-                if (banshees[i].element === b) {
-                    banshees.splice(i,1);
-                    takeDowns++;
-                    break;
-                }
-            }
-        }
-    },100);
-}
-
-/**
- * - Calls bansheeAction which deploys banshees
- * - Starts recurring loop 
- * 
- */
-let spawnTime = 4000;
-let spawnTimeout;
-function spawner() {
-    function spawnLoop() {
-        if (!game) { return; }
-        
-        bansheeAction();
-        
-        if (spawnTime > 800) {
-            spawnTime -= 100;
-        }
-        
-        spawnTimeout = setTimeout(spawnLoop, spawnTime);
+        y += speed; 
     }
-    spawnLoop();
+    if (left) { 
+        if (x < 0) {
+            x = 0;
+        }
+        x -= speed;
+    }
+    if (right) { 
+        if ( x > 930) {
+            x = 930;
+        }
+        x += speed; 
+    }
+    rocket.setAttribute("transform", `translate(${x},${y})`);
+    collision();
 }
 
 /**
  * - If player hp is drained to 0, game over screen is generated
  * - Displays "Game Over"
- * - Displays total game time
- * - Displays banshee takedowns
- * - Displays banshees missed
+ * - Calls endGame()
  * 
  */
 function hpStatus() {
-    if (hp <= 0) {
-        hp = 0;
+    if (stats.hp <= 0) {
+        stats.hp = 0;
+        setGame(false);
         clearInterval(gameTimer);
         rocket.remove();
-        let totalTakeDowns = takeDowns;
-        failStateStats = document.createElementNS(svgNS, "g");
-        svg.appendChild(failStateStats);
 
-        gameOver = document.createElementNS(svgNS, "text");
+        let gameOver = document.createElementNS(svgNS, "text");
         gameOver.setAttribute("x", "370");
         gameOver.setAttribute("y", "200");
         gameOver.setAttribute("font-family", "Arial");
         gameOver.setAttribute("fill", "white");
         gameOver.setAttribute("font-size", "50");
-        failStateStats.appendChild(gameOver);
+        endStats.appendChild(gameOver);
         gameOver.innerHTML = "Game Over";
 
-        timeStat = document.createElementNS(svgNS, "text");
-        timeStat.setAttribute("x", "450");
-        timeStat.setAttribute("y", "250");
-        timeStat.setAttribute("font-family", "Arial");
-        timeStat.setAttribute("fill", "white");
-        timeStat.setAttribute("font-size", "20");
-        failStateStats.appendChild(timeStat);
-        timeStat.innerHTML = "Time: " + gameTime.toFixed(2);
-        
-        takeDownStat = document.createElementNS(svgNS, "text");
-        takeDownStat.setAttribute("x", "400");
-        takeDownStat.setAttribute("y", "280");
-        takeDownStat.setAttribute("font-family", "Arial");
-        takeDownStat.setAttribute("fill", "white");
-        takeDownStat.setAttribute("font-size", "20");
-        failStateStats.appendChild(takeDownStat);
-        takeDownStat.innerHTML = "Banshee Takedowns: " + totalTakeDowns;
-        
-        missedStat = document.createElementNS(svgNS, "text");
-        missedStat.setAttribute("x", "410");
-        missedStat.setAttribute("y", "310");
-        missedStat.setAttribute("font-family", "Arial");
-        missedStat.setAttribute("fill", "white");
-        missedStat.setAttribute("font-size", "20");
-        failStateStats.appendChild(missedStat);
-        missedStat.innerHTML = "Banshees missed: " + passedThrough;
+        endGame();
     }
 }
 
@@ -330,7 +211,7 @@ function hpStatus() {
  * - Subtracts HP from both
  * 
  */
-function collision() {
+export function collision() {
     const lsParts = svg.querySelectorAll("#nose, #trunkLeft, #trunkRight, #leftWing, #rightWing, #leftEngine, #rightEngine, #tail");
 
     banshees.forEach((banshee) => {
@@ -343,7 +224,7 @@ function collision() {
                 const bBody = banshee.element.querySelectorAll("#middleBack, #middleFront");
                 const bJets = banshee.element.querySelectorAll("#leftJet, #rightJet");
         
-                hp-=10;
+                stats.hp-=10;
                 hpStatus();
                 banshee.hp -= 25;
 
@@ -364,15 +245,17 @@ function collision() {
     });
 }
 
-const leftCanon = document.getElementById("leftCanon");
-const rightCanon = document.getElementById("rightCanon");
 /**
  * - Creates and fires missiles upwards from longsword canons
  * - If missiles travel above screen boundary they are removed
  * - If missiles strike banshee, banshee takes damage, missile is removed
  * 
  */
-function missiles() {
+export function missiles() {
+
+    const leftCanon = document.getElementById("leftCanon");
+    const rightCanon = document.getElementById("rightCanon");
+    
     let x1 = x + parseFloat(leftCanon.getAttribute("x"))+1.5;
     let y1 = y + parseFloat(leftCanon.getAttribute("y"))-10;
     
@@ -416,6 +299,7 @@ function missiles() {
         for (let i = 0; i < banshees.length; i++) {
             let target = banshees[i];
             if (!target) { continue; }    
+            
             let hitX = (target.x < x2+2) && (target.x + 55 > x1+1);
             let hitY = (target.y+35 > y1 || target.y+35 > y2) && (target.y < y1+10 || target.y < y2+10);
             
@@ -432,7 +316,7 @@ function missiles() {
                     bBody.forEach(part => part.setAttribute("fill", "indigo"));
                     bJets.forEach(part => part.setAttribute("stroke", "indigo"));
                 }, 50);
-                target.hp -= missileDamage;
+                target.hp -= stats.missileDamage;
                 clearInterval(missileTravel);
                 missile1.remove();
                 missile2.remove();
@@ -441,64 +325,47 @@ function missiles() {
         }
     }, 16);
 }
-// Fires missiles
-document.addEventListener("keydown", (e)=>{
-    if (e.key === " ") {
-        e.preventDefault();
-        missiles();
+
+function endGame() {
+    clearInterval(controllable);
+    setGame(false);
+    if (gameVictory) {
+
+        let gameWon = document.createElementNS(svgNS, "text");
+        gameWon.setAttribute("x", "370");
+        gameWon.setAttribute("y", "200");
+        gameWon.setAttribute("font-family", "Arial");
+        gameWon.setAttribute("fill", "white");
+        gameWon.setAttribute("font-size", "50");
+        endStats.appendChild(gameWon);
+        gameWon.innerHTML = "Mission Complete";
     }
-});
+    
+    let timeStat = document.createElementNS(svgNS, "text");
+    timeStat.setAttribute("x", "450");
+    timeStat.setAttribute("y", "250");
+    timeStat.setAttribute("font-family", "Arial");
+    timeStat.setAttribute("fill", "white");
+    timeStat.setAttribute("font-size", "20");
+    endStats.appendChild(timeStat);
+    timeStat.innerHTML = "Time: " + (gameTime/60).toFixed(2);
+    
+    let takeDownStat = document.createElementNS(svgNS, "text");
+    takeDownStat.setAttribute("x", "400");
+    takeDownStat.setAttribute("y", "280");
+    takeDownStat.setAttribute("font-family", "Arial");
+    takeDownStat.setAttribute("fill", "white");
+    takeDownStat.setAttribute("font-size", "20");
+    endStats.appendChild(takeDownStat);
+    takeDownStat.innerHTML = "Banshee Takedowns: " + takeDowns;
+    
+    let missedStat = document.createElementNS(svgNS, "text");
+    missedStat.setAttribute("x", "410");
+    missedStat.setAttribute("y", "310");
+    missedStat.setAttribute("font-family", "Arial");
+    missedStat.setAttribute("fill", "white");
+    missedStat.setAttribute("font-size", "20");
+    endStats.appendChild(missedStat);
+    missedStat.innerHTML = "Banshees missed: " + passedThrough;
 
-/**
- * - Creates power up node
- * - Node travels down screen until it passes lower boundary
- * - Loop recreates node on interval
- * 
- */
-function powerUp() {
-
-    let yDrift;
-    let drift;
-    let powerNodeSpawner = setInterval(()=>{
-        let powerNode = document.createElementNS(svgNS, "circle");
-        let nodeX = randomXSpawn();
-
-        powerNode.setAttribute("cx", `${nodeX}`);
-        powerNode.setAttribute("cy", ySpawn);
-        powerNode.setAttribute("r", "5");
-        powerNode.setAttribute("fill", "yellow");
-        svg.appendChild(powerNode);
-        powerNode.classList.add("flashing");
-
-        yDrift = 0;
-        if (drift) { clearInterval(drift); }
-        drift = setInterval(()=>{
-            powerNode.setAttribute("cy", yDrift);
-            yDrift++;
-            if (collectPower(nodeX, yDrift)) {
-                powerNode.remove();
-                clearInterval(drift);
-            }
-            if (yDrift > 550) {
-                powerNode.remove();
-                clearInterval(drift);
-            }
-        }, 16);
-    }, 20000);
-}
-
-
-/**
- * - 
- * 
- */
-function collectPower(nodeX, yDrift) {
-    let pickUpX = ( nodeX < x + 70) && (nodeX + 10 > x);
-    let pickUpY = (yDrift < y + 65) && (yDrift + 10 > y);
-
-    if (pickUpX && pickUpY) {
-        missileDamage *= 3;
-        return true;
-    }
-    return false;
 }
