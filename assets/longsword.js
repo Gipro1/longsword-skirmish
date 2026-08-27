@@ -8,9 +8,9 @@
  */
 
 
-import { game, setGame } from "./main.js";
-import { collectPower } from "./collision.js";
-import { banshees, spawner, takeDowns, passedThrough } from "./banshees.js";
+import { btn, game, setGame } from "./main.js";
+import { collectPower } from "./collisions.js";
+import { enemies, spawner, takeDowns, passedThrough } from "./covenant.js";
 import { powerUp } from "./items.js";
 
 const svgNS = "http://www.w3.org/2000/svg";
@@ -18,7 +18,7 @@ export const svg = document.getElementById("mySVG");
 const controls = document.getElementById("controls");
 const endStats = document.getElementById("endStats");
 
-let gameTime = 0.0; // Tracks time spent playing
+export let gameTime = 0.0; // Tracks time spent playing
 let gameTimer; // Timing interval
 let gameVictory = false;
 
@@ -33,7 +33,7 @@ export const stats = {
 
 
 
-let controllable;
+let controllable; // Interval is made to check user inputs every 16ms.
 /**
  * - Starts countdown which triggers game to start.
  * 
@@ -103,7 +103,7 @@ let speed = 10;
 /**
  * - Longsword engines burn hotter
  * - Longsword drifts upwards for 2 seconds
- * - Banshees begin spawning
+ * - Covenant crafts begin spawning
  * - gameTime starts ticking
  * - powerUp function called
  * 
@@ -206,41 +206,65 @@ function hpStatus() {
 
 /**
  * - Tracks player coordinates 
- * - Checks if they intercept banshee coordinates from banshees array
- * - Converts both player and collided banshee colors
+ * - Checks if they intercept enemy coordinates from enemies array
+ * - Converts both player and collided enemy colors
  * - Subtracts HP from both
  * 
  */
 export function collision() {
     const lsParts = svg.querySelectorAll("#nose, #trunkLeft, #trunkRight, #leftWing, #rightWing, #leftEngine, #rightEngine, #tail");
 
-    banshees.forEach((banshee) => {
-        let hitX = (banshee.x < x + 70) && (banshee.x + 55 > x);
-        let hitY = (banshee.y < y + 65) && (banshee.y + 35 > y);
+    enemies.forEach((enemy) => {
+        let hitX = (enemy.x < x + 70) && (enemy.x + enemy.hitW > x);
+        let hitY = (enemy.y < y + 65) && (enemy.y + enemy.hitH > y);
         
         if (hitX && hitY) {
-            if (!banshee.impact) {
-                banshee.impact = true;
-                const bBody = banshee.element.querySelectorAll("#middleBack, #middleFront");
-                const bJets = banshee.element.querySelectorAll("#leftJet, #rightJet");
-        
+            let eBody;
+            let eJets;
+            
+            let sD; // stroke damage color
+            let fD; // fill damage color
+
+            let sC; // stroke color
+            let fC; // fill color
+
+            if (!enemy.impact) {
+                enemy.impact = true;
+                if (enemy.type === "banshee") {
+                    eBody = enemy.element.querySelectorAll("#middleBack, #middleFront");
+                    eJets = enemy.element.querySelectorAll("#leftJet, #rightJet");
+                    sD = "lightblue"; fD = "lightblue";
+                    sC = "indigo"; fC = "indigo";
+
+                } else if (enemy.type === "phantom") {
+                    eBody = enemy.element.querySelectorAll("#body_horizontal_rear, #body_horizontal_front, #left_spike, #right_spike, #mid_spike, #body_left_rear, #body_right_rear, #body_left, #body_right, #body_horizontal_cover, #body_vertical");
+                    sD = "lightblue"; fD = "red";
+                    sC = "#702963"; fC = "#34132E";
+                }
+
                 stats.hp-=10;
                 hpStatus();
-                banshee.hp -= 25;
+                enemy.hp -= 25;
 
                 lsParts.forEach(part => part.setAttribute("fill", "red"));
-                bBody.forEach(part => part.setAttribute("fill", "lightblue"));
-                bJets.forEach(part => part.setAttribute("stroke", "lightblue"));    
+                eBody.forEach(part => part.setAttribute("fill", fD));
+                
+                if (eJets) {
+                    eJets.forEach(part => part.setAttribute("stroke", sD));
+                }
                 
                 setTimeout(() => {
                     lsParts.forEach(part => part.setAttribute("fill", "lightgrey"));
-                    bBody.forEach(part => part.setAttribute("fill", "indigo"));
-                    bJets.forEach(part => part.setAttribute("stroke", "indigo"));
+                    eBody.forEach(part => part.setAttribute("fill", fC));
+
+                    if (eJets) {
+                        eJets.forEach(part => part.setAttribute("stroke", sC));
+                    }
                 }, 100);
             }
             
         } else {
-            banshee.impact = false;
+            enemy.impact = false;
         }
     });
 }
@@ -296,25 +320,46 @@ export function missiles() {
         }
 
         // Cycles through banshees banshees array
-        for (let i = 0; i < banshees.length; i++) {
-            let target = banshees[i];
+        for (let i = 0; i < enemies.length; i++) {
+            let target = enemies[i];
             if (!target) { continue; }    
             
-            let hitX = (target.x < x2+2) && (target.x + 55 > x1+1);
-            let hitY = (target.y+35 > y1 || target.y+35 > y2) && (target.y < y1+10 || target.y < y2+10);
+            let hitX = (target.x < x2+2) && (target.x + target.hitW > x1+1);
+            let hitY = (target.y+target.hitH > y1 || target.y+target.hitH > y2) && (target.y < y1+10 || target.y < y2+10);
             
+            let eBody; // enemy body uses fill
+            let eJets; // jets use stroke
+
+            let sD; // stroke damage color
+            let fD; // fill damage color
+            let sC; // stroke color
+            let fC; // fill color
+
             // Detects missile impacts on banshees
             if (hitX && hitY) {
                 // Flashes banshee color change to indicate damage taken
-                const bBody = target.element.querySelectorAll("#middleBack, #middleFront");
-                const bJets = target.element.querySelectorAll("#leftJet, #rightJet");
+                if (target.type === "banshee") {
+                    eBody = target.element.querySelectorAll("#middleBack, #middleFront");
+                    eJets = target.element.querySelectorAll("#leftJet, #rightJet");
+                    sD = "lightblue"; fD = "lightblue";
+                    sC = "indigo"; fC = "indigo";
 
-                bBody.forEach(part => part.setAttribute("fill", "lightblue"));
-                bJets.forEach(part => part.setAttribute("stroke", "lightblue"));    
-                
+                } else if (target.type === "phantom") {
+                    eBody = target.element.querySelectorAll("#body_horizontal_rear, #body_horizontal_front, #left_spike, #right_spike, #mid_spike, #body_left_rear, #body_right_rear, #body_left, #body_right, #body_horizontal_cover, #body_vertical");
+                    sD = "lightblue"; fD = "red";
+                    sC = "#702963"; fC = "#34132E";
+                }
+                                    
+                eBody.forEach(part => part.setAttribute("fill", fD));
+                if (eJets) {
+                    eJets.forEach(part => part.setAttribute("stroke", sD));    
+                }
+
                 setTimeout(() => {
-                    bBody.forEach(part => part.setAttribute("fill", "indigo"));
-                    bJets.forEach(part => part.setAttribute("stroke", "indigo"));
+                    eBody.forEach(part => part.setAttribute("fill", fC));
+                    if (eJets) {
+                        eJets.forEach(part => part.setAttribute("stroke", sC));    
+                    }
                 }, 50);
                 target.hp -= stats.missileDamage;
                 clearInterval(missileTravel);
@@ -367,5 +412,13 @@ function endGame() {
     missedStat.setAttribute("font-size", "20");
     endStats.appendChild(missedStat);
     missedStat.innerHTML = "Banshees missed: " + passedThrough;
+}
 
+/**
+ * - 
+ * 
+ * @param {*} damage 
+ */
+export function takeDamage(damage) {
+        stats.hp -= damage;
 }

@@ -1,5 +1,5 @@
 /**
- * - 
+ * - Main hold eventListeners for keyboard input to move and shoot.
  * 
  * @author: Angelo Scala
  */
@@ -7,7 +7,7 @@
 
 import { startGame, setDirection, missiles } from "./longsword.js";
 
-const btn = document.getElementById("btn");
+export const btn = document.getElementById("btn");
 
 // Global game state
 export let game = false;
@@ -53,11 +53,13 @@ document.addEventListener("keyup", (e)=>{
 
 document.addEventListener("keydown", (e)=>{
     if (!game) { return; }
-    if (e.key === " " && !firing) {
+    if (e.key === " ") {
         e.preventDefault();
-        firing = true;
-        missiles();
-        firingInterval = setInterval(missiles, 200);
+        if (!firing) {
+            firing = true;
+            missiles();
+            firingInterval = setInterval(missiles, 200);
+        }
     }
 });
 

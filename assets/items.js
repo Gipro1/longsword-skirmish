@@ -8,7 +8,7 @@
 
 import { randomXSpawn, ySpawn } from "./helpers.js";
 import { svg, x, y, stats } from "./longsword.js";
-import { collectPower } from "./collision.js";
+import { collectPower } from "./collisions.js";
 
 const svgNS = "http://www.w3.org/2000/svg";
 
