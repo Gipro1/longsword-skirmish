@@ -9,18 +9,18 @@
 
 
 import { btn, game, setGame } from "./main.js";
-import { collectPower } from "./collisions.js";
+import { clearSplash, endGame } from "./splasn&end.js";
+import { collectPower, hitDetection } from "./collisions.js";
 import { enemies, spawner, takeDowns, passedThrough } from "./covenant.js";
 import { powerUp } from "./items.js";
 
 const svgNS = "http://www.w3.org/2000/svg";
 export const svg = document.getElementById("mySVG");
 const controls = document.getElementById("controls");
-const endStats = document.getElementById("endStats");
 
 export let gameTime = 0.0; // Tracks time spent playing
 let gameTimer; // Timing interval
-let gameVictory = false;
+export let gameVictory = false;
 
 // Longsword
 const rocket = document.getElementById("rocket");
@@ -30,8 +30,8 @@ export const stats = {
     hp: 100,
     missileDamage: 10
 };
-
-
+// Longsword rotation
+let rotated = 0;
 
 let controllable; // Interval is made to check user inputs every 16ms.
 /**
@@ -42,7 +42,6 @@ export function startGame(e) {
     let clock;
     let countDown;
     if (!game) {
-        setGame(true);
         let loading;
         let dots = "";
         setTimeout(()=>{
@@ -57,7 +56,7 @@ export function startGame(e) {
             }
             btn.innerHTML = "Starting" + dots;
         },800);
-        let timer = 5;
+        let timer = 2; // temporary limit.....
         if (clock) {
             clock.remove();
         }
@@ -74,7 +73,9 @@ export function startGame(e) {
         clock.innerHTML = timer;
         countDown = setInterval(()=>{
             if (timer == 0) {
+                clearSplash();
                 clock.remove();
+                setGame(true);
                 intro();
                 clearInterval(countDown);
                 controllable = setInterval(controller, 16);
@@ -113,24 +114,26 @@ function intro() {
     flameRight.setAttribute("points", "47,38,49,50,51,38");
     let startUp = setInterval(()=>{
         y-=2;
-        rocket.setAttribute("transform", `translate(${x},${y})`);
+        rocket.setAttribute("transform", `translate(${x},${y}) rotate(${rotated})`);
     },50);
     setTimeout(()=>{
-        clearInterval(startUp)
+        clearInterval(startUp);
 
         spawner();
         gameTimer = setInterval(()=>{
             gameTime+=0.01;
-            if (gameTime >= 600.00) {
+            if (gameTime >= 600.00) { // game Won!
                 clearInterval(gameTimer);
                 gameVictory = true;
-                endGame();
+                clearInterval(controllable);
+                endGame(gameVictory, gameTime, takeDowns, passedThrough);
             }
         },10);
         
         powerUp();
     },2000);
 }
+
 
 // Directional booleans
 let up = false;
@@ -139,44 +142,98 @@ let left = false;
 let right = false;
 
 export function setDirection(key, pressed) {
-    if (["ArrowUp", "w"].includes(key)) { up = pressed; }
-    if (["ArrowDown", "s"].includes(key)) { down = pressed; }
-    if (["ArrowLeft", "a"].includes(key)) { left = pressed; }
-    if (["ArrowRight", "d"].includes(key)) { right = pressed; }
+    if (["w", "W"].includes(key)) { up = pressed; }
+    if (["s", "S"].includes(key)) { down = pressed; }
+    if (["a", "A"].includes(key)) { left = pressed; }
+    if (["d", "D"].includes(key)) { right = pressed; }
 }
 
 /**
  * - If game is active, increments or decrements x and y based on directional booleans
  * 
  */
-export function controller() {
+function controller() {
+    tilt();
     if (up) { 
         if (y < +7) {
             y = +7;
         }
         y -= speed;
+        tilt();
     }
     if (down) { 
         if (y > 450) {
             y = 450;
         }
-        y += speed; 
+        y += speed;
+        tilt(); 
     }
     if (left) { 
         if (x < 0) {
             x = 0;
         }
         x -= speed;
+        tilt();
     }
     if (right) { 
         if ( x > 930) {
             x = 930;
         }
-        x += speed; 
+        x += speed;
+        tilt();
     }
-    rocket.setAttribute("transform", `translate(${x},${y})`);
+    rocket.setAttribute("transform", `translate(${x},${y}) rotate(${rotated})`);
     collision();
 }
+
+
+// Longsword tilt booleans.
+let leftTilt = false;
+let rightTilt = false;
+
+let shiftDown = false;
+/**
+ * - Updates shiftDown boolean based on eventListeners
+ * from main.js.
+ * 
+ * @param {*} shift 
+ */
+export function shiftCheck(shift) {
+    if (!shift) {
+        shiftDown = false;
+    } else {
+        shiftDown = true;
+    }
+}
+
+/**
+ * - If shift key is down and either left or right is pressed
+ * sets ship rotation.
+ * 
+ */
+function tilt() {
+     if (leftTilt && rightTilt || !leftTilt && !rightTilt) {
+        rotated = 0;
+        
+    } else if (leftTilt) {
+        rotated = -45;
+
+    } else if (rightTilt) {
+        rotated = 45;   
+    }
+}
+
+/**
+ * - 
+ * 
+ * @param {*} key 
+ * @param {*} pressed 
+ */
+export function setTilt(key, pressed) {
+    if (["ArrowLeft"].includes(key)) { leftTilt = pressed; }
+    if (["ArrowRight"].includes(key)) { rightTilt = pressed; }
+}
+
 
 /**
  * - If player hp is drained to 0, game over screen is generated
@@ -184,23 +241,15 @@ export function controller() {
  * - Calls endGame()
  * 
  */
-function hpStatus() {
+export function hpStatus() {
     if (stats.hp <= 0) {
         stats.hp = 0;
         setGame(false);
         clearInterval(gameTimer);
         rocket.remove();
-
-        let gameOver = document.createElementNS(svgNS, "text");
-        gameOver.setAttribute("x", "370");
-        gameOver.setAttribute("y", "200");
-        gameOver.setAttribute("font-family", "Arial");
-        gameOver.setAttribute("fill", "white");
-        gameOver.setAttribute("font-size", "50");
-        endStats.appendChild(gameOver);
-        gameOver.innerHTML = "Game Over";
-
-        endGame();
+        
+        clearInterval(controllable);
+        endGame(gameVictory, gameTime, takeDowns, passedThrough);
     }
 }
 
@@ -218,56 +267,10 @@ export function collision() {
         let hitX = (enemy.x < x + 70) && (enemy.x + enemy.hitW > x);
         let hitY = (enemy.y < y + 65) && (enemy.y + enemy.hitH > y);
         
-        if (hitX && hitY) {
-            let eBody;
-            let eJets;
-            
-            let sD; // stroke damage color
-            let fD; // fill damage color
-
-            let sC; // stroke color
-            let fC; // fill color
-
-            if (!enemy.impact) {
-                enemy.impact = true;
-                if (enemy.type === "banshee") {
-                    eBody = enemy.element.querySelectorAll("#middleBack, #middleFront");
-                    eJets = enemy.element.querySelectorAll("#leftJet, #rightJet");
-                    sD = "lightblue"; fD = "lightblue";
-                    sC = "indigo"; fC = "indigo";
-
-                } else if (enemy.type === "phantom") {
-                    eBody = enemy.element.querySelectorAll("#body_horizontal_rear, #body_horizontal_front, #left_spike, #right_spike, #mid_spike, #body_left_rear, #body_right_rear, #body_left, #body_right, #body_horizontal_cover, #body_vertical");
-                    sD = "lightblue"; fD = "red";
-                    sC = "#702963"; fC = "#34132E";
-                }
-
-                stats.hp-=10;
-                hpStatus();
-                enemy.hp -= 25;
-
-                lsParts.forEach(part => part.setAttribute("fill", "red"));
-                eBody.forEach(part => part.setAttribute("fill", fD));
-                
-                if (eJets) {
-                    eJets.forEach(part => part.setAttribute("stroke", sD));
-                }
-                
-                setTimeout(() => {
-                    lsParts.forEach(part => part.setAttribute("fill", "lightgrey"));
-                    eBody.forEach(part => part.setAttribute("fill", fC));
-
-                    if (eJets) {
-                        eJets.forEach(part => part.setAttribute("stroke", sC));
-                    }
-                }, 100);
-            }
-            
-        } else {
-            enemy.impact = false;
-        }
+        hitDetection(hitX, hitY, enemy, "collision");
     });
 }
+
 
 /**
  * - Creates and fires missiles upwards from longsword canons
@@ -276,149 +279,132 @@ export function collision() {
  * 
  */
 export function missiles() {
-
     const leftCanon = document.getElementById("leftCanon");
-    const rightCanon = document.getElementById("rightCanon");
+
+    // Coordinats for missileDuo group spawn
+    let xDuo = x + parseFloat(leftCanon.getAttribute("x"))+1.5;
+    let yDuo = y + parseFloat(leftCanon.getAttribute("y"));
     
-    let x1 = x + parseFloat(leftCanon.getAttribute("x"))+1.5;
-    let y1 = y + parseFloat(leftCanon.getAttribute("y"))-10;
-    
-    let x2 = x + parseFloat(rightCanon.getAttribute("x"))+1.5;
-    let y2 = y + parseFloat(rightCanon.getAttribute("y"))-10;
+        // Checks for longsword tilt for every missileDuo fired.
+    let angledLeft = false;
+    let angledRight = false;
+    let missileTilt = 0;
+
+    // Determines missile angle upon firing.
+    if (leftTilt) {
+        angledLeft = true;
+        xDuo -= 1;
+        yDuo -= 14;
+    } else if (rightTilt) {
+        angledRight = true;
+        xDuo -= 13;
+        yDuo += 17;
+    }
+    if (!angledLeft && !angledRight) {
+            missileTilt = 0; // tilt angle
+        } else {
+            if (angledLeft) {
+                missileTilt = -45; // 30 degrees left
+            } else if (angledRight) {
+                missileTilt = 45; // 30 degrees right
+            }
+        }
+
+    let missileDuo = document.createElementNS(svgNS, "g");
+    missileDuo.setAttribute("transform", `translate(${xDuo}, ${yDuo}) rotate(${missileTilt})`);
+    svg.appendChild(missileDuo);
 
     let missile1 = document.createElementNS(svgNS, "ellipse");
-    missile1.setAttribute("cx", `${x1}`);
-    missile1.setAttribute("cy", `${y1}`);
+    missile1.setAttribute("cx", `${1}`);
+    missile1.setAttribute("cy", `${-7}`);
     missile1.setAttribute("r", "1");
     missile1.setAttribute("rx", "1");
     missile1.setAttribute("ry", "10");
     missile1.setAttribute("fill", "orange");
-    svg.appendChild(missile1);
+    missileDuo.appendChild(missile1);
 
     let missile2 = document.createElementNS(svgNS, "ellipse");
-    missile2.setAttribute("cx", `${x2}`);
-    missile2.setAttribute("cy", `${y2}`);
+    missile2.setAttribute("cx", `${26}`);
+    missile2.setAttribute("cy", `${-7}`);
     missile2.setAttribute("r", "1");
     missile2.setAttribute("rx", "1");
     missile2.setAttribute("ry", "10");
     missile2.setAttribute("fill", "orange");
-    svg.appendChild(missile2);
+    missileDuo.appendChild(missile2);
+    let missileTick = 0; // Tracks time missiles exist.
+
     let missileTravel;
+    //  let missileAngled = false;
 
-    missileTravel = setInterval(()=>{
-        y1-=10;
-        y2-=10;
-        missile1.setAttribute("cy", `${y1}`);
-        missile2.setAttribute("cy", `${y2}`);
+    // Checks for longsword tilt for every missileDuo fired.
+    missileTravel = setInterval(()=>{ // Assigns missile directional speed.
+        if (!angledLeft && !angledRight) {
+            yDuo-=10;
+        } else {
+            if (angledLeft) {
+                yDuo-=7;
+                xDuo-=7;
+            } else if (angledRight) {
+                yDuo-=7;
+                xDuo+=7;
+            }
+        }
+        missileDuo.setAttribute("transform", `translate(${xDuo},${yDuo}) rotate(${missileTilt})`);
+        missileTick++;
 
-        // boundary check stops interval if above viewport
-        if (y1 < 0 || y2 < 0) {
+        // Boundary check stops interval if above viewport.
+        if (yDuo < 0) {
             missile1.remove();
             missile2.remove();
+            missileDuo.remove();
+            clearInterval(missileTravel);
+            return;
+        } else if (missileTick > 188) { // Removes missiles if they become frozen in view.
+            missile1.remove();
+            missile2.remove();
+            missileDuo.remove();
             clearInterval(missileTravel);
             return;
         }
 
         // Cycles through banshees banshees array
         for (let i = 0; i < enemies.length; i++) {
-            let target = enemies[i];
-            if (!target) { continue; }    
+            let enemy = enemies[i];
+            if (!enemy) { continue; }    
             
-            let hitX = (target.x < x2+2) && (target.x + target.hitW > x1+1);
-            let hitY = (target.y+target.hitH > y1 || target.y+target.hitH > y2) && (target.y < y1+10 || target.y < y2+10);
+            // hitX and hitY make up enemy hitbox
+            let hitX = (enemy.x < xDuo+2) && (enemy.x + enemy.hitW > xDuo+1);
+            let hitY = (enemy.y+enemy.hitH > yDuo || enemy.y+enemy.hitH > yDuo) && (enemy.y < yDuo+10 || enemy.y < yDuo+10);
             
-            let eBody; // enemy body uses fill
-            let eJets; // jets use stroke
-
-            let sD; // stroke damage color
-            let fD; // fill damage color
-            let sC; // stroke color
-            let fC; // fill color
-
             // Detects missile impacts on banshees
-            if (hitX && hitY) {
-                // Flashes banshee color change to indicate damage taken
-                if (target.type === "banshee") {
-                    eBody = target.element.querySelectorAll("#middleBack, #middleFront");
-                    eJets = target.element.querySelectorAll("#leftJet, #rightJet");
-                    sD = "lightblue"; fD = "lightblue";
-                    sC = "indigo"; fC = "indigo";
-
-                } else if (target.type === "phantom") {
-                    eBody = target.element.querySelectorAll("#body_horizontal_rear, #body_horizontal_front, #left_spike, #right_spike, #mid_spike, #body_left_rear, #body_right_rear, #body_left, #body_right, #body_horizontal_cover, #body_vertical");
-                    sD = "lightblue"; fD = "red";
-                    sC = "#702963"; fC = "#34132E";
-                }
-                                    
-                eBody.forEach(part => part.setAttribute("fill", fD));
-                if (eJets) {
-                    eJets.forEach(part => part.setAttribute("stroke", sD));    
-                }
-
-                setTimeout(() => {
-                    eBody.forEach(part => part.setAttribute("fill", fC));
-                    if (eJets) {
-                        eJets.forEach(part => part.setAttribute("stroke", sC));    
-                    }
-                }, 50);
-                target.hp -= stats.missileDamage;
+            if (hitDetection(hitX, hitY, enemy, "missileImpact")) {
                 clearInterval(missileTravel);
                 missile1.remove();
                 missile2.remove();
+                missileDuo.remove();
                 return;
             }
         }
     }, 16);
 }
 
-function endGame() {
-    clearInterval(controllable);
-    setGame(false);
-    if (gameVictory) {
-
-        let gameWon = document.createElementNS(svgNS, "text");
-        gameWon.setAttribute("x", "370");
-        gameWon.setAttribute("y", "200");
-        gameWon.setAttribute("font-family", "Arial");
-        gameWon.setAttribute("fill", "white");
-        gameWon.setAttribute("font-size", "50");
-        endStats.appendChild(gameWon);
-        gameWon.innerHTML = "Mission Complete";
-    }
-    
-    let timeStat = document.createElementNS(svgNS, "text");
-    timeStat.setAttribute("x", "450");
-    timeStat.setAttribute("y", "250");
-    timeStat.setAttribute("font-family", "Arial");
-    timeStat.setAttribute("fill", "white");
-    timeStat.setAttribute("font-size", "20");
-    endStats.appendChild(timeStat);
-    timeStat.innerHTML = "Time: " + (gameTime/60).toFixed(2);
-    
-    let takeDownStat = document.createElementNS(svgNS, "text");
-    takeDownStat.setAttribute("x", "400");
-    takeDownStat.setAttribute("y", "280");
-    takeDownStat.setAttribute("font-family", "Arial");
-    takeDownStat.setAttribute("fill", "white");
-    takeDownStat.setAttribute("font-size", "20");
-    endStats.appendChild(takeDownStat);
-    takeDownStat.innerHTML = "Banshee Takedowns: " + takeDowns;
-    
-    let missedStat = document.createElementNS(svgNS, "text");
-    missedStat.setAttribute("x", "410");
-    missedStat.setAttribute("y", "310");
-    missedStat.setAttribute("font-family", "Arial");
-    missedStat.setAttribute("fill", "white");
-    missedStat.setAttribute("font-size", "20");
-    endStats.appendChild(missedStat);
-    missedStat.innerHTML = "Banshees missed: " + passedThrough;
-}
 
 /**
- * - 
+ * - Subtracts damage amount from longsword's hp.
+ * - Flashes longsword's color to indicate damage taken.
  * 
  * @param {*} damage 
  */
 export function takeDamage(damage) {
         stats.hp -= damage;
+        if (stats.hp < 0) {
+            stats.hp = 0;
+        }
+        hpStatus();
+
+        const lsParts = svg.querySelectorAll("#nose, #trunkLeft, #trunkRight, #leftWing, #rightWing, #leftEngine, #rightEngine, #tail"); 
+        lsParts.forEach(part => part.setAttribute("fill", "red"));
+        setTimeout(()=>{
+            lsParts.forEach(part => part.setAttribute("fill", "lightgrey"));
+        }, 100);
 }

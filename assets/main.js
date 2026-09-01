@@ -5,7 +5,8 @@
  */
 
 
-import { startGame, setDirection, missiles } from "./longsword.js";
+import { startGame, setDirection, shiftCheck, missiles, setTilt } from "./longsword.js";
+import { splashScreen } from "./splasn&end.js";
 
 export const btn = document.getElementById("btn");
 
@@ -16,13 +17,15 @@ export function setGame(state) {
 }
 
 btn.addEventListener("click", (e) => startGame(e));
+window.addEventListener("load", splashScreen);
 
+// Directional controls
+const controlKeys = ["w", "W", "s", "S", "a", "A", "d", "D"];
 
-const controlKeys = ["ArrowUp", "w", "ArrowDown", "s", "ArrowLeft", "a", "ArrowRight", "d"];
 
 // Event Listener takes keydown inputs for directional booleans
 document.addEventListener("keyup", (e) => {
-    if (controlKeys.includes(e.key)) {
+    if (controlKeys.includes(e.key)) { // checks controlKeys list for e.key
         e.preventDefault();
         setDirection(e.key, false);
     }
@@ -31,17 +34,17 @@ document.addEventListener("keyup", (e) => {
 // Event Listener takes keyup inputs for directional booleans
 document.addEventListener("keydown", (e) => {
     if (!game) { return; }
-    if (controlKeys.includes(e.key)) {
+    if (controlKeys.includes(e.key)) { // checks controlKeys list for e.key
         e.preventDefault();
         setDirection(e.key, true);
     }
 });
 
+
 let firing = false;
 let firingInterval = null;
 
 // Event Listeners for firing missiles
-
 document.addEventListener("keyup", (e)=>{
     if (e.key === " ") {
         e.preventDefault();
@@ -63,3 +66,43 @@ document.addEventListener("keydown", (e)=>{
     }
 });
 
+
+// Event Listeners for shift key
+/*
+document.addEventListener("keyup", (e)=>{
+    if (e.key === "Shift") {
+        e.preventDefault();
+        shiftCheck(false);
+    }
+});
+
+document.addEventListener("keydown", (e)=>{
+    if (!game) {return;}
+    if (e.key === "Shift") {
+        e.preventDefault();
+        shiftCheck(true);
+    }
+});
+*/
+
+
+// Tilt controls
+const tiltKeys = ["ArrowLeft", "ArrowRight"];
+
+
+// Event Listener takes keydown inputs for tilt booleans
+document.addEventListener("keyup", (e) => {
+    if (tiltKeys.includes(e.key)) { 
+        e.preventDefault();
+        setTilt(e.key, false);
+    }
+});
+
+// Event Listener takes keyup inputs for tilt booleans
+document.addEventListener("keydown", (e) => {
+    if (!game) { return; }
+    if (tiltKeys.includes(e.key)) { 
+        e.preventDefault();
+        setTilt(e.key, true);
+    }
+});

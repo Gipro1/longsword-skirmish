@@ -1,0 +1,292 @@
+/**
+ * - Displays splash screen on page load presenting game controls.
+ * 
+ * @author: Angelo Scala
+ */
+
+import { svg, gameVictory, gameTime } from "./longsword.js";
+import { takeDowns, passedThrough } from "./covenant.js";
+
+const startScreen = document.getElementById("startScreen");
+const svgNS = "http://www.w3.org/2000/svg";
+
+const splash = document.getElementById("splash");
+const endStats = document.getElementById("endStats");
+
+/**
+ * - Presents splash screen to display game controls upon page load. 
+ * 
+ */
+export function splashScreen() {
+            splash.setAttribute("x", "100");
+            splash.setAttribute("y", "100");
+            svg.appendChild(splash);
+
+            // Move Longsword controls
+            let movement = document.createElementNS(svgNS, "text");
+            movement.setAttribute("x", "120");
+            movement.setAttribute("y", "70");
+            movement.setAttribute("font-family", "Arial");
+            movement.setAttribute("fill", "lightblue");
+            movement.setAttribute("font-size", "20");
+            movement.innerHTML = "Move Longsword";
+            splash.appendChild(movement);
+
+            let movementUnderline = document.createElementNS(svgNS, "line");
+            movementUnderline.setAttribute("x1", "120");
+            movementUnderline.setAttribute("y1", "80");
+            movementUnderline.setAttribute("x2", "270");
+            movementUnderline.setAttribute("y2", "80");
+            movementUnderline.setAttribute("stroke", "lightblue");
+            movementUnderline.setAttribute("stroke-width", "2");
+            splash.appendChild(movementUnderline);
+
+            // W key
+            let wKey = document.createElementNS(svgNS, "rect");
+            wKey.setAttribute("x", "160");
+            wKey.setAttribute("y", "100");
+            wKey.setAttribute("width", "50");
+            wKey.setAttribute("height", "50");
+            wKey.setAttribute("rx", "10");
+            wKey.setAttribute("ry", "10");
+            wKey.setAttribute("stroke", "lightblue");
+            wKey.setAttribute("stroke-width", "2");
+            splash.appendChild(wKey);
+
+            let wChar = document.createElementNS(svgNS, "text");
+            wChar.setAttribute("x", "165");
+            wChar.setAttribute("y", "125");
+            wChar.setAttribute("font-family", "Arial");
+            wChar.setAttribute("fill", "lightblue");
+            wChar.setAttribute("font-size", "25");
+            wChar.innerHTML = "W";
+            splash.appendChild(wChar);
+
+            // A key
+            let aKey = document.createElementNS(svgNS, "rect");
+            aKey.setAttribute("x", "115");
+            aKey.setAttribute("y", "160");
+            aKey.setAttribute("width", "50");
+            aKey.setAttribute("height", "50");
+            aKey.setAttribute("rx", "10");
+            aKey.setAttribute("ry", "10");
+            aKey.setAttribute("stroke", "lightblue");
+            aKey.setAttribute("stroke-width", "2");
+            splash.appendChild(aKey);
+
+            let aChar = document.createElementNS(svgNS, "text");
+            aChar.setAttribute("x", "120");
+            aChar.setAttribute("y", "185");
+            aChar.setAttribute("font-family", "Arial");
+            aChar.setAttribute("fill", "lightblue");
+            aChar.setAttribute("font-size", "25");
+            aChar.innerHTML = "A";
+            splash.appendChild(aChar);
+
+            // S key
+            let sKey = document.createElementNS(svgNS, "rect");
+            sKey.setAttribute("x", "175");
+            sKey.setAttribute("y", "160");
+            sKey.setAttribute("width", "50");
+            sKey.setAttribute("height", "50");
+            sKey.setAttribute("rx", "10");
+            sKey.setAttribute("ry", "10");
+            sKey.setAttribute("stroke", "lightblue");
+            sKey.setAttribute("stroke-width", "2");
+            splash.appendChild(sKey);
+
+            let sChar = document.createElementNS(svgNS, "text");
+            sChar.setAttribute("x", "180");
+            sChar.setAttribute("y", "185");
+            sChar.setAttribute("font-family", "Arial");
+            sChar.setAttribute("fill", "lightblue");
+            sChar.setAttribute("font-size", "25");
+            sChar.innerHTML = "S";
+            splash.appendChild(sChar);
+
+            // D key
+            let dKey = document.createElementNS(svgNS, "rect");
+            dKey.setAttribute("x", "235");
+            dKey.setAttribute("y", "160");
+            dKey.setAttribute("width", "50");
+            dKey.setAttribute("height", "50");
+            dKey.setAttribute("rx", "10");
+            dKey.setAttribute("ry", "10");
+            dKey.setAttribute("stroke", "lightblue");
+            dKey.setAttribute("stroke-width", "2");
+            splash.appendChild(dKey);
+
+            let dChar = document.createElementNS(svgNS, "text");
+            dChar.setAttribute("x", "240");
+            dChar.setAttribute("y", "185");
+            dChar.setAttribute("font-family", "Arial");
+            dChar.setAttribute("fill", "lightblue");
+            dChar.setAttribute("font-size", "25");
+            dChar.innerHTML = "D";
+            splash.appendChild(dChar);
+
+            // Spacebar to shoot
+            let shoot = document.createElementNS(svgNS, "text");
+            shoot.setAttribute("x", "135");
+            shoot.setAttribute("y", "256");
+            shoot.setAttribute("font-family", "Arial");
+            shoot.setAttribute("fill", "lightblue");
+            shoot.setAttribute("font-size", "20");
+            shoot.innerHTML = "Shoot Missiles";
+            splash.appendChild(shoot);
+
+            let shootUnderline = document.createElementNS(svgNS, "line");
+            shootUnderline.setAttribute("x1", "135");
+            shootUnderline.setAttribute("y1", "265");
+            shootUnderline.setAttribute("x2", "265");
+            shootUnderline.setAttribute("y2", "265");
+            shootUnderline.setAttribute("stroke", "lightblue");
+            shootUnderline.setAttribute("stroke-width", "2");
+            splash.appendChild(shootUnderline);
+
+            let spaceBar = document.createElementNS(svgNS, "rect");
+            spaceBar.setAttribute("x", "100");
+            spaceBar.setAttribute("y", "285");
+            spaceBar.setAttribute("width", "200");
+            spaceBar.setAttribute("height", "50");
+            spaceBar.setAttribute("rx", "10");
+            spaceBar.setAttribute("ry", "10");
+            spaceBar.setAttribute("stroke", "lightblue");
+            spaceBar.setAttribute("stroke-width", "2");
+            splash.appendChild(spaceBar);
+
+            let spaceLabel = document.createElementNS(svgNS, "text");
+            spaceLabel.setAttribute("x", "160");
+            spaceLabel.setAttribute("y", "320");
+            spaceLabel.setAttribute("font-family", "Arial");
+            spaceLabel.setAttribute("fill", "lightblue");
+            spaceLabel.setAttribute("font-size", "25");
+            spaceLabel.innerHTML = "Space";
+            splash.appendChild(spaceLabel);
+
+
+            // Arrow Keys for longsword tilt
+            let shipTilt = document.createElementNS(svgNS, "text");
+            shipTilt.setAttribute("x", "710");
+            shipTilt.setAttribute("y", "130");
+            shipTilt.setAttribute("font-family", "Arial");
+            shipTilt.setAttribute("fill", "lightblue");
+            shipTilt.setAttribute("font-size", "20");
+            shipTilt.innerHTML = "Rotate Longsword";
+            splash.appendChild(shipTilt);
+
+            let shipTiltUnderline = document.createElementNS(svgNS, "line");
+            shipTiltUnderline.setAttribute("x1", "710");
+            shipTiltUnderline.setAttribute("y1", "140");
+            shipTiltUnderline.setAttribute("x2", "870");
+            shipTiltUnderline.setAttribute("y2", "140");
+            shipTiltUnderline.setAttribute("stroke", "lightblue");
+            shipTiltUnderline.setAttribute("stroke-width", "2");
+            splash.appendChild(shipTiltUnderline);
+
+            // Left arrow
+            let leftArrowKey = document.createElementNS(svgNS, "rect");
+            leftArrowKey.setAttribute("x", "705");
+            leftArrowKey.setAttribute("y", "160");
+            leftArrowKey.setAttribute("width", "50");
+            leftArrowKey.setAttribute("height", "50");
+            leftArrowKey.setAttribute("rx", "10");
+            leftArrowKey.setAttribute("ry", "10");
+            leftArrowKey.setAttribute("stroke", "lightblue");
+            leftArrowKey.setAttribute("stroke-width", "2");
+            splash.appendChild(leftArrowKey);
+
+            let leftArrow = document.createElementNS(svgNS, "polygon");
+            leftArrow.setAttribute("points", "712,175,720,170,720,175,730,175,720,175,720,180,712,175");
+            leftArrow.setAttribute("stroke", "lightblue");
+            leftArrow.setAttribute("fill", "lightblue");
+            leftArrow.setAttribute("stroke-width", "2");
+            splash.appendChild(leftArrow);
+
+            // Right arrow
+            let rightArrowKey = document.createElementNS(svgNS, "rect");
+            rightArrowKey.setAttribute("x", "825");
+            rightArrowKey.setAttribute("y", "160");
+            rightArrowKey.setAttribute("width", "50");
+            rightArrowKey.setAttribute("height", "50");
+            rightArrowKey.setAttribute("rx", "10");
+            rightArrowKey.setAttribute("ry", "10");
+            rightArrowKey.setAttribute("stroke", "lightblue");
+            rightArrowKey.setAttribute("stroke-width", "2");
+            splash.appendChild(rightArrowKey);
+
+            let rightArrow = document.createElementNS(svgNS, "polygon");
+            rightArrow.setAttribute("points", "850,175 842,170 842,175 832,175 842,175 842,180 850,175");
+            rightArrow.setAttribute("stroke", "lightblue");
+            rightArrow.setAttribute("fill", "lightblue");
+            rightArrow.setAttribute("stroke-width", "2");
+            splash.appendChild(rightArrow);
+            
+}
+
+/**
+ * - Removes splash screen upon game start.
+ * 
+ */
+export function clearSplash() {
+    svg.removeChild(splash);
+}
+
+// not used currently
+export function appendSplash() {
+    svg.appendChild(splash);
+}
+
+/**
+ * - 
+ * 
+ */
+export function endGame(gameVictory, gametime, takeDowns, passedThrough) {
+    if (gameVictory) {
+
+        let gameWon = document.createElementNS(svgNS, "text");
+        gameWon.setAttribute("x", "300");
+        gameWon.setAttribute("y", "200");
+        gameWon.setAttribute("font-family", "Arial");
+        gameWon.setAttribute("fill", "white");
+        gameWon.setAttribute("font-size", "50");
+        endStats.appendChild(gameWon);
+        gameWon.innerHTML = "Mission Complete";
+    } else {
+        let gameOver = document.createElementNS(svgNS, "text");
+        gameOver.setAttribute("x", "370");
+        gameOver.setAttribute("y", "200");
+        gameOver.setAttribute("font-family", "Arial");
+        gameOver.setAttribute("fill", "white");
+        gameOver.setAttribute("font-size", "50");
+        endStats.appendChild(gameOver);
+        gameOver.innerHTML = "Game Over";
+    }
+    
+    let timeStat = document.createElementNS(svgNS, "text");
+    timeStat.setAttribute("x", "450");
+    timeStat.setAttribute("y", "250");
+    timeStat.setAttribute("font-family", "Arial");
+    timeStat.setAttribute("fill", "white");
+    timeStat.setAttribute("font-size", "20");
+    endStats.appendChild(timeStat);
+    timeStat.innerHTML = "Time: " + (gameTime/60).toFixed(2);
+    
+    let takeDownStat = document.createElementNS(svgNS, "text");
+    takeDownStat.setAttribute("x", "400");
+    takeDownStat.setAttribute("y", "280");
+    takeDownStat.setAttribute("font-family", "Arial");
+    takeDownStat.setAttribute("fill", "white");
+    takeDownStat.setAttribute("font-size", "20");
+    endStats.appendChild(takeDownStat);
+    takeDownStat.innerHTML = "Banshee Takedowns: " + takeDowns;
+    
+    let missedStat = document.createElementNS(svgNS, "text");
+    missedStat.setAttribute("x", "410");
+    missedStat.setAttribute("y", "310");
+    missedStat.setAttribute("font-family", "Arial");
+    missedStat.setAttribute("fill", "white");
+    missedStat.setAttribute("font-size", "20");
+    endStats.appendChild(missedStat);
+    missedStat.innerHTML = "Banshees missed: " + passedThrough;
+}

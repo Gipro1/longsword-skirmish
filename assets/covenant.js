@@ -95,14 +95,14 @@ function removeEnemy(enemyObj, reason) {
  * - Temporarily, for the sake of making sure this shit works, enemies can start spawning at the beginning
  * 
  */
-let spawnTime = 4000;
+let spawnTime = 10000;
 let spawnTimeout;
 let enemyType;
 export function spawner() {
     function spawnLoop() {
         if (!game) { return; }
     
-        if (parseInt(gameTime) % 5 == 0) {
+        if (gameTime > 0 && parseInt(gameTime) % 60 == 0) {
             enemyType = "phantom";
         } else {
             enemyType = "banshee";
@@ -110,7 +110,7 @@ export function spawner() {
 
         spawnEnemy(enemyType);
         if (spawnTime > 800) {
-            spawnTime -= 100;
+            spawnTime -= 50;
         }
         
         spawnTimeout = setTimeout(spawnLoop, spawnTime);
@@ -180,6 +180,7 @@ function blasters(enemyObj) {
         const x2 = enemyObj.x + turretBox.x + turretBox.width;
         let plasmaY = enemyObj.y + turretBox.y + turretBox.height;
     
+        // plasma SVGs
         let plasma1 = document.createElementNS(svgNS, "ellipse");
         plasma1.setAttribute("cx", x1);
         plasma1.setAttribute("cy", plasmaY);
@@ -227,6 +228,7 @@ function blasters(enemyObj) {
         let plasmaX = enemyObj.x + cannonBox.x + cannonBox.width / 2;
         let plasmaY = enemyObj.y + cannonBox.y + cannonBox.height;
     
+        // plasma SVG
         let plasmaCannon = document.createElementNS(svgNS, "ellipse");
         plasmaCannon.setAttribute("cx", plasmaX);
         plasmaCannon.setAttribute("cy", plasmaY);
