@@ -19,6 +19,7 @@ svg {
     border: 1px solid white;
 }
 
+/* powerUp Animation */
 @keyframes flash {
     0% { opacity: 1; }
     50% { opacity: 0; }
@@ -28,6 +29,23 @@ svg {
 .flashing {
     animation-name: flash;
     animation-duration: 1.5s;
+    animation-timing-function: ease-out;
+    animation-iteration-count: infinite;
+}
+
+/* Fenris nuke Animation */
+@keyframes pulse {
+    0% { scale: 1; }
+    50% { scale: 3; }
+    65% { scale: 1; }
+    70% { scale: 3; }
+    85% { scale: 1; }
+    100% { scale: 1; }
+}
+
+.pulsing {
+    animation-name: flash;
+    animation-duration: 2s;
     animation-timing-function: ease-out;
     animation-iteration-count: infinite;
 }

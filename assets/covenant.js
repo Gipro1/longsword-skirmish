@@ -17,21 +17,24 @@ const svg = document.getElementById("mySVG");
 const banshee = document.getElementById("banshee");
 
 export let enemies = [];
-export let takeDowns = 0;
 export let passedThrough = 0;
 let enemyCount = 0;
 
-const enemyTypes = {
+export const enemyTypes = {
     banshee: {
         templateId: "banshee", 
         hp: 100,
         hitW: 55, hitH: 35,
+        takeDowns: 0,
+        passedThrough: 0,
         update: update
     },
     phantom: {
         templateId: "phantom",
         hp: 1000, 
         hitW: 69, hitH: 75,
+        takeDowns: 0,
+        passedThrough: 0,
         update: update
     }
 }
@@ -70,40 +73,51 @@ export function spawnEnemy(typeName) {
         if (enemyObj.y > 540) {
             clearInterval(tick);
             removeEnemy(enemyObj, "passed");
+        
         } else if (enemyObj.hp <= 0) {
             clearInterval(tick);
             removeEnemy(enemyObj, "killed");
+
         }
     }, 100);
 }
 
 /**
- * - 
+ * - Checks if enemy is firing. Clears firing.
+ * - Removes enemy element, removes enemy from enemies array.
+ * - Addes 1 to stat variables based on removal reason.
  * 
  * @param {*} enemyObj 
  * @param {*} reason 
  */
 function removeEnemy(enemyObj, reason) {
+    // Clears firing if firing.
+    if (enemyObj.fireRate) {
+        clearInterval(enemyObj.fireRate);
+        enemyObj.fireRate = null;
+    }
     enemyObj.element.remove();
     const i = enemies.indexOf(enemyObj);
     if (i !== -1) enemies.splice(i,1);
-    if (reason === "passed") passedThrough++;
-    if (reason === "killed") takeDowns++;
+    if (reason === "passed") enemyTypes[enemyObj.type].passedThrough++;
+    if (reason === "killed") enemyTypes[enemyObj.type].takeDowns++;
 }
 
 /**
- * - Temporarily, for the sake of making sure this shit works, enemies can start spawning at the beginning
+ * - Controls enemy spawns.
  * 
  */
 let spawnTime = 10000;
 let spawnTimeout;
 let enemyType;
 export function spawner() {
+    let lastPhantom = 0;
     function spawnLoop() {
         if (!game) { return; }
     
-        if (gameTime > 0 && parseInt(gameTime) % 60 == 0) {
+        if (gameTime - lastPhantom >= 20) {
             enemyType = "phantom";
+            lastPhantom = gameTime;
         } else {
             enemyType = "banshee";
         }
@@ -162,7 +176,7 @@ function update(enemyObj) {
                     blasters(enemyObj);
                 }, 1000);
             }
-        }
+        }   
     }
 }
 
@@ -256,15 +270,18 @@ function blasters(enemyObj) {
             plasmaCannon.setAttribute("cx", plasmaX);
             plasmaCannon.setAttribute("cy", plasmaY);
 
+            const hitX = (plasmaX >= x && plasmaX <= x + 70);
+            const hitY = (plasmaY >= y - 7 && plasmaY <= y +65);
+
             // boundary check stops interval if above viewport
             if (plasmaY > 550 || plasmaX > 1000 || plasmaX < 0) {
                 plasmaCannon.remove();
                 clearInterval(plasmaTravel);
-            } /*else if (hit) {
+            } else if (hitX && hitY) {
                 plasmaCannon.remove();
                 clearInterval(plasmaTravel);
-                takeDamage(enemyObj.type, 20);
-            }*/
+                takeDamage(20);
+            }
         }, 16);
     }
 }

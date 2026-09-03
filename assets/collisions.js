@@ -6,7 +6,7 @@
 
 
 import { svg, stats as longsword, hpStatus } from "./longsword.js";
-import { enemies, spawner, takeDowns, passedThrough } from "./covenant.js";
+import { enemies, spawner, enemyTypes } from "./covenant.js";
 import { powerUpCount } from "./items.js";
 
 /**

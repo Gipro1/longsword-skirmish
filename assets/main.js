@@ -5,7 +5,8 @@
  */
 
 
-import { startGame, setDirection, shiftCheck, missiles, setTilt } from "./longsword.js";
+import { startGame, setDirection, shiftCheck, setTilt, x, y, leftTilt, rightTilt } from "./longsword.js";
+import { missiles } from "./weapons.js";
 import { splashScreen } from "./splasn&end.js";
 
 export const btn = document.getElementById("btn");
@@ -60,8 +61,10 @@ document.addEventListener("keydown", (e)=>{
         e.preventDefault();
         if (!firing) {
             firing = true;
-            missiles();
-            firingInterval = setInterval(missiles, 200);
+            missiles(x, y, leftTilt, rightTilt);
+            firingInterval = setInterval(() => {
+                missiles(x, y, leftTilt, rightTilt);
+            }, 200);
         }
     }
 });

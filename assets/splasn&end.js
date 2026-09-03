@@ -5,13 +5,14 @@
  */
 
 import { svg, gameVictory, gameTime } from "./longsword.js";
-import { takeDowns, passedThrough } from "./covenant.js";
+import { enemyTypes, passedThrough } from "./covenant.js";
 
 const startScreen = document.getElementById("startScreen");
 const svgNS = "http://www.w3.org/2000/svg";
 
 const splash = document.getElementById("splash");
 const endStats = document.getElementById("endStats");
+
 
 /**
  * - Presents splash screen to display game controls upon page load. 
@@ -32,6 +33,7 @@ export function splashScreen() {
             movement.innerHTML = "Move Longsword";
             splash.appendChild(movement);
 
+            /*
             let movementUnderline = document.createElementNS(svgNS, "line");
             movementUnderline.setAttribute("x1", "120");
             movementUnderline.setAttribute("y1", "80");
@@ -40,6 +42,7 @@ export function splashScreen() {
             movementUnderline.setAttribute("stroke", "lightblue");
             movementUnderline.setAttribute("stroke-width", "2");
             splash.appendChild(movementUnderline);
+            */
 
             // W key
             let wKey = document.createElementNS(svgNS, "rect");
@@ -128,13 +131,14 @@ export function splashScreen() {
             // Spacebar to shoot
             let shoot = document.createElementNS(svgNS, "text");
             shoot.setAttribute("x", "135");
-            shoot.setAttribute("y", "256");
+            shoot.setAttribute("y", "266");
             shoot.setAttribute("font-family", "Arial");
             shoot.setAttribute("fill", "lightblue");
             shoot.setAttribute("font-size", "20");
             shoot.innerHTML = "Shoot Missiles";
             splash.appendChild(shoot);
 
+            /*
             let shootUnderline = document.createElementNS(svgNS, "line");
             shootUnderline.setAttribute("x1", "135");
             shootUnderline.setAttribute("y1", "265");
@@ -143,10 +147,11 @@ export function splashScreen() {
             shootUnderline.setAttribute("stroke", "lightblue");
             shootUnderline.setAttribute("stroke-width", "2");
             splash.appendChild(shootUnderline);
+            */
 
             let spaceBar = document.createElementNS(svgNS, "rect");
             spaceBar.setAttribute("x", "100");
-            spaceBar.setAttribute("y", "285");
+            spaceBar.setAttribute("y", "295");
             spaceBar.setAttribute("width", "200");
             spaceBar.setAttribute("height", "50");
             spaceBar.setAttribute("rx", "10");
@@ -157,7 +162,7 @@ export function splashScreen() {
 
             let spaceLabel = document.createElementNS(svgNS, "text");
             spaceLabel.setAttribute("x", "160");
-            spaceLabel.setAttribute("y", "320");
+            spaceLabel.setAttribute("y", "330");
             spaceLabel.setAttribute("font-family", "Arial");
             spaceLabel.setAttribute("fill", "lightblue");
             spaceLabel.setAttribute("font-size", "25");
@@ -175,6 +180,7 @@ export function splashScreen() {
             shipTilt.innerHTML = "Rotate Longsword";
             splash.appendChild(shipTilt);
 
+            /*
             let shipTiltUnderline = document.createElementNS(svgNS, "line");
             shipTiltUnderline.setAttribute("x1", "710");
             shipTiltUnderline.setAttribute("y1", "140");
@@ -183,6 +189,7 @@ export function splashScreen() {
             shipTiltUnderline.setAttribute("stroke", "lightblue");
             shipTiltUnderline.setAttribute("stroke-width", "2");
             splash.appendChild(shipTiltUnderline);
+            */
 
             // Left arrow
             let leftArrowKey = document.createElementNS(svgNS, "rect");
@@ -241,7 +248,7 @@ export function appendSplash() {
  * - 
  * 
  */
-export function endGame(gameVictory, gametime, takeDowns, passedThrough) {
+export function endGame(gameVictory, gametime, enemyTypes) {
     if (gameVictory) {
 
         let gameWon = document.createElementNS(svgNS, "text");
@@ -272,21 +279,42 @@ export function endGame(gameVictory, gametime, takeDowns, passedThrough) {
     endStats.appendChild(timeStat);
     timeStat.innerHTML = "Time: " + (gameTime/60).toFixed(2);
     
-    let takeDownStat = document.createElementNS(svgNS, "text");
-    takeDownStat.setAttribute("x", "400");
-    takeDownStat.setAttribute("y", "280");
-    takeDownStat.setAttribute("font-family", "Arial");
-    takeDownStat.setAttribute("fill", "white");
-    takeDownStat.setAttribute("font-size", "20");
-    endStats.appendChild(takeDownStat);
-    takeDownStat.innerHTML = "Banshee Takedowns: " + takeDowns;
+    let takeDownStatB = document.createElementNS(svgNS, "text");
+    takeDownStatB.setAttribute("x", "400");
+    takeDownStatB.setAttribute("y", "280");
+    takeDownStatB.setAttribute("font-family", "Arial");
+    takeDownStatB.setAttribute("fill", "white");
+    takeDownStatB.setAttribute("font-size", "20");
+    endStats.appendChild(takeDownStatB);
+    takeDownStatB.innerHTML = "Banshee Takedowns: " + enemyTypes.banshee.takeDowns;
     
-    let missedStat = document.createElementNS(svgNS, "text");
-    missedStat.setAttribute("x", "410");
-    missedStat.setAttribute("y", "310");
-    missedStat.setAttribute("font-family", "Arial");
-    missedStat.setAttribute("fill", "white");
-    missedStat.setAttribute("font-size", "20");
-    endStats.appendChild(missedStat);
-    missedStat.innerHTML = "Banshees missed: " + passedThrough;
+    let missedStatB = document.createElementNS(svgNS, "text");
+    missedStatB.setAttribute("x", "410");
+    missedStatB.setAttribute("y", "310");
+    missedStatB.setAttribute("font-family", "Arial");
+    missedStatB.setAttribute("fill", "white");
+    missedStatB.setAttribute("font-size", "20");
+    endStats.appendChild(missedStatB);
+    missedStatB.innerHTML = "Banshees missed: " + enemyTypes.banshee.passedThrough;
+
+    if (enemyTypes.phantom.takeDowns > 0) {
+
+        let takeDownStatP = document.createElementNS(svgNS, "text");
+        takeDownStatP.setAttribute("x", "400");
+        takeDownStatP.setAttribute("y", "340");
+        takeDownStatP.setAttribute("font-family", "Arial");
+        takeDownStatP.setAttribute("fill", "white");
+        takeDownStatP.setAttribute("font-size", "20");
+        endStats.appendChild(takeDownStatP);
+        takeDownStatP.innerHTML = "Phantom Takedowns: " + enemyTypes.phantom.takeDowns;
+        
+        let missedStatP = document.createElementNS(svgNS, "text");
+        missedStatP.setAttribute("x", "410");
+        missedStatP.setAttribute("y", "370");
+        missedStatP.setAttribute("font-family", "Arial");
+        missedStatP.setAttribute("fill", "white");
+        missedStatP.setAttribute("font-size", "20");
+        endStats.appendChild(missedStatP);
+        missedStatP.innerHTML = "Phantoms missed: " + enemyTypes.phantom.passedThrough;
+    }
 }
