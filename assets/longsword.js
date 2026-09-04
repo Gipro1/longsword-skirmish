@@ -28,7 +28,7 @@ const flameLeft = document.getElementById("flameLeft");
 const flameRight = document.getElementById("flameRight");
 export const stats = {
     hp: 100,
-    missileDamage: 10
+    missileDamage: 5
 };
 // Longsword rotation
 let rotated = 0;
@@ -190,6 +190,7 @@ function controller() {
 // Longsword tilt booleans.
 export let leftTilt = false;
 export let rightTilt = false;
+export let tiltString = "";
 
 let shiftDown = false; // not used
 /**
@@ -214,12 +215,15 @@ export function shiftCheck(shift) {
 function tilt() {
      if (leftTilt && rightTilt || !leftTilt && !rightTilt) {
         rotated = 0;
+        tiltString = "";
         
     } else if (leftTilt) {
         rotated = -45;
+        tiltString = "left";
 
     } else if (rightTilt) {
         rotated = 45;   
+        tiltString = "right";
     }
 }
 
