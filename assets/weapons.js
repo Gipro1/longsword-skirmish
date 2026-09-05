@@ -14,14 +14,30 @@ import { hitDetection } from "./collisions.js";
 
 const svgNS = "http://www.w3.org/2000/svg";
 
-export let equippedWeapon = "missileDuo";
+export let equippedWeapon = "missiles";
 
 /**
- * - Called from main using up and down arrow keys. // not working yet
+ * - Called from main using up and down arrow keys. // not setup yet
  * 
  */
 export function setWeapon() {
     equippedWeapon = weaponType;
+}
+
+/**
+ * - Fires equippedWeapon.
+ * 
+ * @param {*} x 
+ * @param {*} y 
+ * @param {*} tiltString 
+ */
+export function fireWeapon(x, y, tiltString) {
+    if (equippedWeapon === "missiles") {
+        missiles(x, y, tiltString);
+
+    } else if (equippedWeapon === "quadMissiles") {
+        quadMissiles(x, y, tiltString);
+    }
 }
 
 
@@ -35,7 +51,7 @@ export function setWeapon() {
  * @param {*} y - Longsword's y
  * @param {*} tiltString - Indicates rotated direction 
  */
-export function missiles(x, y, tiltString) {
+function missiles(x, y, tiltString) {
     const canon = document.getElementById("leftCanon");
 
     // Coordinats for missileDuo group spawn
@@ -217,7 +233,7 @@ export function missiles(x, y, tiltString) {
  * @param {*} leftTilt 
  * @param {*} rightTilt 
  */
-export function missileQuadShot(x, y, tiltString) {
+export function quadMissiles(x, y, tiltString) {
     const canon = document.getElementById("leftCanon");
 
     // Coordinats for missiles in missileQuad group

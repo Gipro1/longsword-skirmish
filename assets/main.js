@@ -5,11 +5,15 @@
  */
 
 
-import { startGame, setDirection, shiftCheck, setTilt, x, y, tiltString } from "./longsword.js";
-import { missiles } from "./weapons.js";
+import { startGame, pauseGame, setDirection, setTilt, x, y, tiltString } from "./longsword.js";
+import { fireWeapon, setWeapon } from "./weapons.js";
 import { splashScreen } from "./splasn&end.js";
+import { displayWeapon } from "./hud.js";
 
 export const btn = document.getElementById("btn");
+
+// Splash screen displays game controls.
+window.addEventListener("load", splashScreen);
 
 // Global game state
 export let game = false;
@@ -17,12 +21,34 @@ export function setGame(state) {
     game = state;
 }
 
-btn.addEventListener("click", (e) => startGame(e));
-window.addEventListener("load", splashScreen);
+
+// Clicked prevents spamming start button.
+let clicked = false;
+/**
+ * - Start button listener.
+ */
+btn.addEventListener("click", (e) => {
+    if (!clicked) {
+        if (!game) {
+            clicked = true;
+            startGame(e);
+        } else {
+            pauseGame();
+        }
+    } else {
+        return;
+    }
+});
+
+
+
+/**
+ * - Event Listeners for directional controls.
+ * 
+ */
 
 // Directional controls
 const controlKeys = ["w", "W", "s", "S", "a", "A", "d", "D"];
-
 
 // Event Listener takes keydown inputs for directional booleans
 document.addEventListener("keyup", (e) => {
@@ -40,6 +66,21 @@ document.addEventListener("keydown", (e) => {
         setDirection(e.key, true);
     }
 });
+
+
+/**
+ * - Event listeners for weapon selection and firing.
+ * 
+ */
+
+const cycleWeapons = ["ArrowUp", "ArrowDown"];
+
+// Event Listener for weapon icon display in HUD
+/*
+document.addEventListener("keydown", (e) =>{
+    
+});
+*/
 
 
 let firing = false;
@@ -61,9 +102,9 @@ document.addEventListener("keydown", (e)=>{
         e.preventDefault();
         if (!firing) {
             firing = true;
-            missiles(x, y, tiltString);
+            fireWeapon(x, y, tiltString);
             firingInterval = setInterval(() => {
-                missiles(x, y, tiltString);
+                fireWeapon(x, y, tiltString);
             }, 200);
         }
     }

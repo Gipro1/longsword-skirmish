@@ -6,6 +6,7 @@
 
 import { svg, gameVictory, gameTime } from "./longsword.js";
 import { enemyTypes, passedThrough } from "./covenant.js";
+import { formatGameTime } from "./hud.js";
 
 const startScreen = document.getElementById("startScreen");
 const svgNS = "http://www.w3.org/2000/svg";
@@ -271,13 +272,13 @@ export function endGame(gameVictory, gametime, enemyTypes) {
     }
     
     let timeStat = document.createElementNS(svgNS, "text");
-    timeStat.setAttribute("x", "450");
+    timeStat.setAttribute("x", "430");
     timeStat.setAttribute("y", "250");
     timeStat.setAttribute("font-family", "Arial");
     timeStat.setAttribute("fill", "white");
     timeStat.setAttribute("font-size", "20");
     endStats.appendChild(timeStat);
-    timeStat.innerHTML = "Time: " + (gameTime/60).toFixed(2);
+    timeStat.innerHTML = "Time: " + formatGameTime(gameTime);
     
     let takeDownStatB = document.createElementNS(svgNS, "text");
     takeDownStatB.setAttribute("x", "400");

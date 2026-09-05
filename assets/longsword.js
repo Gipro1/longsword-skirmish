@@ -10,9 +10,11 @@
 
 import { btn, game, setGame } from "./main.js";
 import { clearSplash, endGame } from "./splasn&end.js";
+import { displayTime, displayWeapon } from "./hud.js";
 import { collectPower, hitDetection } from "./collisions.js";
 import { enemies, spawner, enemyTypes } from "./covenant.js";
 import { powerUp } from "./items.js";
+import { equippedWeapon } from "./weapons.js";
 
 const svgNS = "http://www.w3.org/2000/svg";
 export const svg = document.getElementById("mySVG");
@@ -76,6 +78,7 @@ export function startGame(e) {
                 clearSplash();
                 clock.remove();
                 setGame(true);
+                displayWeapon(equippedWeapon);
                 intro();
                 clearInterval(countDown);
                 controllable = setInterval(controller, 16);
@@ -90,12 +93,12 @@ export function startGame(e) {
 }
 
 /**
- * - Not made yet
+ * - No pausing.
  * 
- *//*
-function pauseGame(e) {
-
-}*/
+ */
+export function pauseGame() {
+    btn.innerHTML = "No Pausing...";
+}
 
 // default position
 export let x = 465;
@@ -122,6 +125,7 @@ function intro() {
         spawner();
         gameTimer = setInterval(()=>{
             gameTime+=0.01;
+            displayTime();
             if (gameTime >= 600.00) { // game Won!
                 clearInterval(gameTimer);
                 gameVictory = true;
