@@ -24,7 +24,7 @@ export const enemyTypes = {
     banshee: {
         templateId: "banshee", 
         hp: 100,
-        hitW: 55, hitH: 35,
+        hitW: 55, hitH: 35, // hitbox
         takeDowns: 0,
         passedThrough: 0,
         update: update
@@ -32,7 +32,7 @@ export const enemyTypes = {
     phantom: {
         templateId: "phantom",
         hp: 1000, 
-        hitW: 69, hitH: 75,
+        hitW: 69, hitH: 75, // hitbox
         takeDowns: 0,
         passedThrough: 0,
         update: update
@@ -107,7 +107,7 @@ function removeEnemy(enemyObj, reason) {
  * - Controls enemy spawns.
  * 
  */
-let spawnTime = 10000;
+let spawnTime = 6000;
 let spawnTimeout;
 let enemyType;
 export function spawner() {
@@ -123,8 +123,8 @@ export function spawner() {
         }
 
         spawnEnemy(enemyType);
-        if (spawnTime > 800) {
-            spawnTime -= 50;
+        if (spawnTime > 500) {
+            spawnTime -= 70;
         }
         
         spawnTimeout = setTimeout(spawnLoop, spawnTime);

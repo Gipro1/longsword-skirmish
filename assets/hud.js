@@ -52,9 +52,34 @@ export function displayTime() {
 }
 
 
+let hp;
+/**
+ * 
+ * 
+ */
+export function displayHP() {
+    if (hp) {
+        hp.remove();
+    }
+    hp = document.createElementNS(svgNS, "text");
+    hp.setAttribute("x", "930");
+    hp.setAttribute("y", "25");
+    hp.setAttribute("font-family", "Arial");
+    hp.setAttribute("fill", "orange");
+    hp.setAttribute("font-size", "20");
+    svg.appendChild(hp);
+    hp.innerHTML = stats.hp;    
+}
+
+
+/**
+ * - Displays equipped weapon icon in lower right corner.
+ * 
+ * @param {*} equippedWeapon 
+ */
 export function displayWeapon(equippedWeapon) {
     let weaponSpace = document.createElementNS(svgNS, "g");
-    weaponSpace.setAttribute("transform", "translate(850,450)");
+    weaponSpace.setAttribute("transform", "translate(900,450)");
     svg.appendChild(weaponSpace);
 
     if (equippedWeapon === "missiles") {

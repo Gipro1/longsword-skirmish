@@ -1,6 +1,7 @@
 /**
  * - Controls collectible spawns and tracks collection.
  * - PowerUp multiplies missile damage when collected.
+ * - RegenHP restores longsword hp.
  * - Armament adds firing modes. // pending
  * - Fenris adds nuke. // pending
  * - TimeExtend adds 60 seconds to game's time limit. // pending
@@ -11,12 +12,12 @@
 
 import { randomXSpawn, ySpawn } from "./helpers.js";
 import { svg, x, y, stats } from "./longsword.js";
-import { collectPower } from "./collisions.js";
+import { collectItem } from "./collisions.js";
 
 const svgNS = "http://www.w3.org/2000/svg";
 
 export let powerUpCount = 0;
-
+export let regenHPCount = 0;
 
 /**
  * - Creates powerUp.
@@ -27,10 +28,9 @@ export let powerUpCount = 0;
  * 
  */
 export function powerUp() {
-
-    let yDrift;
-    let drift;
     let powerUpSpawner = setInterval(()=>{
+        let yDrift;
+        let drift;
         let powerNode = document.createElementNS(svgNS, "circle");
         let nodeX = randomXSpawn();
 
@@ -46,7 +46,7 @@ export function powerUp() {
         drift = setInterval(()=>{
             powerNode.setAttribute("cy", yDrift);
             yDrift++;
-            if (collectPower(nodeX, yDrift, x, y)) {
+            if (collectItem(nodeX, yDrift, x, y, "powerUp")) {
                 stats.missileDamage *= 3;
                 powerUpCount++;
                 powerNode.remove();
@@ -61,6 +61,50 @@ export function powerUp() {
 }
 
 
+
+/**
+ * - Creates regenHP.
+ * - Flashes green.
+ * - Travels down screen until it passes lower boundary or is collected.
+ * - Loop recreates regenHP on interval.
+ * - Regenerates and adds to longsword hp.
+ * 
+ */
+export function regenHP() {
+    let regenSpawner = setInterval(()=>{
+        let yDrift;
+        let drift;
+        let regenNode = document.createElementNS(svgNS, "circle");
+        let nodeX = randomXSpawn();
+
+        regenNode.setAttribute("cx", `${nodeX}`);
+        regenNode.setAttribute("cy", ySpawn);
+        regenNode.setAttribute("r", "5");
+        regenNode.setAttribute("fill", "chartreuse");
+        svg.appendChild(regenNode);
+        regenNode.classList.add("blinking");
+
+        yDrift = 0;
+        if (drift) { clearInterval(drift); }
+        drift = setInterval(()=>{
+            regenNode.setAttribute("cy", yDrift);
+            yDrift++;
+            if (collectItem(nodeX, yDrift, x, y, "regenHP")) {
+                stats.hp += 50;
+                regenHPCount++;
+                regenNode.remove();
+                clearInterval(drift);
+            }
+            if (yDrift > 550) {
+                regenNode.remove();
+                clearInterval(drift);
+            }
+        }, 16);
+    }, 60000);
+}
+
+
+
 /**
  * - Creates Fenris nuke.
  * - Pulses red.
@@ -68,6 +112,7 @@ export function powerUp() {
  * - Loop recreates Fenris on interval.
  * 
  */
+/*
 export function fenrisNuke() {
 
     let yDrift;
@@ -88,7 +133,7 @@ export function fenrisNuke() {
         drift = setInterval(()=>{
             fenrisNode.setAttribute("cy", yDrift);
             yDrift++;
-            if (collectPower(nodeX, yDrift, x, y)) {
+            if (collectItem(nodeX, yDrift, x, y)) {
                 
                 fenrisNode.remove();
                 clearInterval(drift);
@@ -100,3 +145,5 @@ export function fenrisNuke() {
         }, 16);
     }, 10000);
 }
+
+*/

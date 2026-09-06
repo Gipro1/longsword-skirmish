@@ -5,18 +5,28 @@
  */
 
 
-import { startGame, pauseGame, setDirection, setTilt, x, y, tiltString } from "./longsword.js";
+import { startGame, setDirection, setTilt, x, y, tiltString } from "./longsword.js";
 import { fireWeapon, setWeapon } from "./weapons.js";
-import { splashScreen } from "./splasn&end.js";
+import { splashScreen } from "./splash&end.js";
 import { displayWeapon } from "./hud.js";
 
+// Start button
 export const btn = document.getElementById("btn");
+// Start button text "Start"
+export const start = document.getElementById("start");
 
 // Splash screen displays game controls.
 window.addEventListener("load", splashScreen);
 
 // Global game state
 export let game = false;
+/**
+ * - game set to true when started.
+ * - Several functions require game = true to work.
+ * - game is set to false after either victory or death. 
+ * 
+ * @param {*} state 
+ */
 export function setGame(state) {
     game = state;
 }
@@ -28,16 +38,9 @@ let clicked = false;
  * - Start button listener.
  */
 btn.addEventListener("click", (e) => {
-    if (!clicked) {
-        if (!game) {
-            clicked = true;
-            startGame(e);
-        } else {
-            pauseGame();
-        }
-    } else {
-        return;
-    }
+    if (clicked || game) { return; }
+        clicked = true;
+        startGame(e);
 });
 
 
@@ -66,6 +69,7 @@ document.addEventListener("keydown", (e) => {
         setDirection(e.key, true);
     }
 });
+
 
 
 /**

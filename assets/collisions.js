@@ -1,5 +1,7 @@
 /**
- * - 
+ * - Handles item collections, collisions, and projectile impacts.
+ * - collectItem handles item collections.
+ * - hitDetection handles craft collisions with longsword and missile impacts on enemy crafts.
  * 
  * @author: Angelo Scala
  */
@@ -7,10 +9,24 @@
 
 import { svg, stats as longsword, hpStatus } from "./longsword.js";
 import { enemies, spawner, enemyTypes } from "./covenant.js";
-import { powerUpCount } from "./items.js";
+
+const svgNS = "http://www.w3.org/2000/svg";
+
 
 /**
- * - Handles powerUp collection.
+ * - Function is called to retrieve longsword parts.
+ * 
+ * @returns - lsParts variable containing longsword parts. 
+ */
+function getLongswordParts() {
+    const lsParts = svg.querySelectorAll("#nose, #trunkLeft, #trunkRight, #leftWing, #rightWing, #leftEngine, #rightEngine, #tail");
+    return lsParts;
+}
+
+/**
+ * - Handles item collection.
+ * - Longsword flashes color based on item.
+ * - Item effect pops up.
  * 
  * @param {*} nodeX 
  * @param {*} yDrift 
@@ -18,12 +34,40 @@ import { powerUpCount } from "./items.js";
  * @param {*} y - longsword y
  * @returns boolean
  */
-export function collectPower(nodeX, yDrift, x, y) {
+export function collectItem(nodeX, yDrift, x, y, item) {
     let pickUpX = ( nodeX < x + 70) && (nodeX + 10 > x);
     let pickUpY = (yDrift < y + 65) && (yDrift + 10 > y);
-
+    
+    const lsParts = getLongswordParts();
     if (pickUpX && pickUpY) {
-        //powerUpCount++;
+        let flashColor;
+        let pickUp;
+        let pickUpMsg;
+        
+        // Detects item type.
+        if (item === "powerUp") { 
+            flashColor = "yellow";
+            pickUpMsg = "DMG +";
+        } else if (item === "regenHP") {
+            flashColor = "chartreuse";
+            pickUpMsg = "HP +";
+        }
+        lsParts.forEach(part => part.setAttribute("fill", `${flashColor}`)); // Longsword flashes item color.
+        if (pickUp) {
+            pickUp.remove();
+        }
+        pickUp = document.createElementNS(svgNS, "text"); // Displays item effect.
+        pickUp.setAttribute("x", `${x+19}`);
+        pickUp.setAttribute("y", `${y-20}`);
+        pickUp.setAttribute("font-family", "Arial");
+        pickUp.setAttribute("fill", `${flashColor}`);
+        pickUp.setAttribute("font-size", "15");
+        pickUp.innerHTML = pickUpMsg;
+        svg.appendChild(pickUp);
+        setTimeout(() => {
+            lsParts.forEach(part => part.setAttribute("fill", "lightgrey"));
+            pickUp.remove();
+        }, 500);
         return true;
     }
     return false;
@@ -53,8 +97,8 @@ export function hitDetection(hitX, hitY, enemy, hitType) {
     }
     
     if (hitX && hitY) { // Fresh collision
-        const lsParts = svg.querySelectorAll("#nose, #trunkLeft, #trunkRight, #leftWing, #rightWing, #leftEngine, #rightEngine, #tail");
-        
+        const lsParts = getLongswordParts();
+
         let eBody; // enemy body uses fill
         let eJets; // jets use stroke
 

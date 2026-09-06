@@ -34,17 +34,6 @@ export function splashScreen() {
             movement.innerHTML = "Move Longsword";
             splash.appendChild(movement);
 
-            /*
-            let movementUnderline = document.createElementNS(svgNS, "line");
-            movementUnderline.setAttribute("x1", "120");
-            movementUnderline.setAttribute("y1", "80");
-            movementUnderline.setAttribute("x2", "270");
-            movementUnderline.setAttribute("y2", "80");
-            movementUnderline.setAttribute("stroke", "lightblue");
-            movementUnderline.setAttribute("stroke-width", "2");
-            splash.appendChild(movementUnderline);
-            */
-
             // W key
             let wKey = document.createElementNS(svgNS, "rect");
             wKey.setAttribute("x", "160");
@@ -139,17 +128,6 @@ export function splashScreen() {
             shoot.innerHTML = "Shoot Missiles";
             splash.appendChild(shoot);
 
-            /*
-            let shootUnderline = document.createElementNS(svgNS, "line");
-            shootUnderline.setAttribute("x1", "135");
-            shootUnderline.setAttribute("y1", "265");
-            shootUnderline.setAttribute("x2", "265");
-            shootUnderline.setAttribute("y2", "265");
-            shootUnderline.setAttribute("stroke", "lightblue");
-            shootUnderline.setAttribute("stroke-width", "2");
-            splash.appendChild(shootUnderline);
-            */
-
             let spaceBar = document.createElementNS(svgNS, "rect");
             spaceBar.setAttribute("x", "100");
             spaceBar.setAttribute("y", "295");
@@ -180,17 +158,6 @@ export function splashScreen() {
             shipTilt.setAttribute("font-size", "20");
             shipTilt.innerHTML = "Rotate Longsword";
             splash.appendChild(shipTilt);
-
-            /*
-            let shipTiltUnderline = document.createElementNS(svgNS, "line");
-            shipTiltUnderline.setAttribute("x1", "710");
-            shipTiltUnderline.setAttribute("y1", "140");
-            shipTiltUnderline.setAttribute("x2", "870");
-            shipTiltUnderline.setAttribute("y2", "140");
-            shipTiltUnderline.setAttribute("stroke", "lightblue");
-            shipTiltUnderline.setAttribute("stroke-width", "2");
-            splash.appendChild(shipTiltUnderline);
-            */
 
             // Left arrow
             let leftArrowKey = document.createElementNS(svgNS, "rect");

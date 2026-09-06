@@ -12,13 +12,15 @@ body {
 h1 {
     color: white;
     font-size: 1.5em;
-    margin-top: 10px;
 }
 
 svg {
     background-color: black;
     border: 1px solid white;
-    margin: 0 auto;
+}
+
+#btn:active rect {
+    fill: white;
 }
 
 /* powerUp Animation */
@@ -35,6 +37,27 @@ svg {
     animation-iteration-count: infinite;
 }
 
+/* regenHP Animation */
+@keyframes blink {
+    0% { scale: 0.5; opacity: 0.5; }
+    40% { scale: 0.5; opacity: 0.5; }
+    50% { scale: 2; opacity: 1; }
+    60% { scale: 0.5; opacity: 0.5; }
+    100% { scale: 0.5; opacity: 0.5; } 
+}
+
+.blinking {
+    /* Forces svg element to use it's own bounding box rather than global canvas */
+    transform-box: fill-box;
+    /* Anchors to item's own center */
+    transform-origin: center;
+    
+    animation-name: blink;
+    animation-duration: 1s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+
 /* Fenris nuke Animation */
 @keyframes pulse {
     0% { scale: 1; }
@@ -46,7 +69,8 @@ svg {
 }
 
 .pulsing {
-    animation-name: flash;
+    transform-origin: 0 0;
+    animation-name: pulse;
     animation-duration: 2s;
     animation-timing-function: ease-out;
     animation-iteration-count: infinite;

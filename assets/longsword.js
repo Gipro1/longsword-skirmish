@@ -8,21 +8,21 @@
  */
 
 
-import { btn, game, setGame } from "./main.js";
-import { clearSplash, endGame } from "./splasn&end.js";
-import { displayTime, displayWeapon } from "./hud.js";
-import { collectPower, hitDetection } from "./collisions.js";
+import { btn, start, game, setGame } from "./main.js";
+import { clearSplash, endGame } from "./splash&end.js";
+import { displayTime, displayHP, displayWeapon } from "./hud.js";
+import { hitDetection } from "./collisions.js";
 import { enemies, spawner, enemyTypes } from "./covenant.js";
-import { powerUp } from "./items.js";
+import { powerUp, regenHP } from "./items.js";
 import { equippedWeapon } from "./weapons.js";
 
 const svgNS = "http://www.w3.org/2000/svg";
 export const svg = document.getElementById("mySVG");
-const controls = document.getElementById("controls");
 
 export let gameTime = 0.0; // Tracks time spent playing
 let gameTimer; // Timing interval
 export let gameVictory = false;
+export let timeLimit = 600.00;
 
 // Longsword
 const rocket = document.getElementById("rocket");
@@ -48,17 +48,20 @@ export function startGame(e) {
         let dots = "";
         setTimeout(()=>{
             clearInterval(loading);
-            setTimeout(()=>{ btn.innerHTML = "Pause"; }, 1000);
-        }, 5000);
+            setTimeout(()=>{
+                start.remove();
+                btn.remove();
+            }, 1000);
+        }, 3000);
         loading = setInterval(()=>{
             if (dots === "...") {
                 dots = ".";
             } else {
                 dots += ".";
             }
-            btn.innerHTML = "Starting" + dots;
-        },800);
-        let timer = 2; // temporary limit.....
+            start.innerHTML = "START" + dots;
+        },990);
+        let timer = 3; // temporary limit.....
         if (clock) {
             clock.remove();
         }
@@ -79,6 +82,7 @@ export function startGame(e) {
                 clock.remove();
                 setGame(true);
                 displayWeapon(equippedWeapon);
+                displayHP();
                 intro();
                 clearInterval(countDown);
                 controllable = setInterval(controller, 16);
@@ -92,13 +96,7 @@ export function startGame(e) {
     }
 }
 
-/**
- * - No pausing.
- * 
- */
-export function pauseGame() {
-    btn.innerHTML = "No Pausing...";
-}
+
 
 // default position
 export let x = 465;
@@ -126,15 +124,18 @@ function intro() {
         gameTimer = setInterval(()=>{
             gameTime+=0.01;
             displayTime();
-            if (gameTime >= 600.00) { // game Won!
+            displayHP();
+            if (gameTime >= timeLimit) {
                 clearInterval(gameTimer);
                 gameVictory = true;
                 clearInterval(controllable);
                 endGame(gameVictory, gameTime, enemyTypes);
+                setGame(false);
             }
         },10);
         
         powerUp();
+        regenHP();
     },2000);
 }
 
@@ -253,6 +254,7 @@ export function setTilt(key, pressed) {
 export function hpStatus() {
     if (stats.hp <= 0) {
         stats.hp = 0;
+        displayHP();
         setGame(false);
         clearInterval(gameTimer);
         rocket.remove();
