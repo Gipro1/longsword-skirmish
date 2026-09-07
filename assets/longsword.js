@@ -10,7 +10,7 @@
 
 import { btn, start, game, setGame } from "./main.js";
 import { clearSplash, endGame } from "./splash&end.js";
-import { displayTime, displayHP, displayWeapon } from "./hud.js";
+import { displayTime, displayHP, displayWeapon, hitDetectHP } from "./hud.js";
 import { hitDetection } from "./collisions.js";
 import { enemies, spawner, enemyTypes } from "./covenant.js";
 import { powerUp, regenHP } from "./items.js";
@@ -22,7 +22,7 @@ export const svg = document.getElementById("mySVG");
 export let gameTime = 0.0; // Tracks time spent playing
 let gameTimer; // Timing interval
 export let gameVictory = false;
-export let timeLimit = 600.00;
+export let timeLimit = 300.00;
 
 // Longsword
 const rocket = document.getElementById("rocket");
@@ -91,7 +91,6 @@ export function startGame(e) {
             clock.innerHTML = timer;
         },1000);
     } else {
-        //pauseGame(e);
         console.log("fun");
     }
 }
@@ -298,6 +297,7 @@ export function takeDamage(damage) {
 
         const lsParts = svg.querySelectorAll("#nose, #trunkLeft, #trunkRight, #leftWing, #rightWing, #leftEngine, #rightEngine, #tail"); 
         lsParts.forEach(part => part.setAttribute("fill", "red"));
+        hitDetectHP();
         setTimeout(()=>{
             lsParts.forEach(part => part.setAttribute("fill", "lightgrey"));
         }, 100);

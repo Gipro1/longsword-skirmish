@@ -7,7 +7,7 @@
  */
 
 
-import { svg, stats as longsword, hpStatus } from "./longsword.js";
+import { svg, stats as longsword, hpStatus, takeDamage } from "./longsword.js";
 import { enemies, spawner, enemyTypes } from "./covenant.js";
 
 const svgNS = "http://www.w3.org/2000/svg";
@@ -22,6 +22,7 @@ function getLongswordParts() {
     const lsParts = svg.querySelectorAll("#nose, #trunkLeft, #trunkRight, #leftWing, #rightWing, #leftEngine, #rightEngine, #tail");
     return lsParts;
 }
+
 
 /**
  * - Handles item collection.
@@ -150,6 +151,35 @@ export function hitDetection(hitX, hitY, enemy, hitType) {
     }
 }
 
-export function plasmaImpact() {
-    
+/**
+ * - Tracks enemy weapon fire. Each individual plasmaFire.
+ * - If plasmaFire goes beyond boundary or strikes longsword.
+ * - plasmaFire is removed from DOM and function returns true triggering 
+ * plasma element to be set to null.
+ * 
+ * @param {*} plasmaFire 
+ * @param {*} plasmaX 
+ * @param {*} plasmaY 
+ * @param {*} x - longsword's x
+ * @param {*} y - longsword's y
+ * @param {*} enemy - enemyObj.type
+ * @returns 
+ */
+export function plasmaImpact(plasmaFire, plasmaX, plasmaY, x, y, enemy) {
+    const hitX = (plasmaX >= x && plasmaX <= x + 70);
+    const hitY = (plasmaY >= y - 7 && plasmaY <= y +65);
+
+    // boundary check stops interval if beyond viewport
+    if (plasmaY > 550|| plasmaX > 1000 || plasmaX < 0) {
+        plasmaFire.remove();
+        return true;
+    } else if (hitX && hitY) {
+        plasmaFire.remove();
+        if (enemy === "banshee") {
+            takeDamage(5);
+        } else if (enemy === "phantom") {
+            takeDamage(20);
+        }
+        return true;
+    }
 }

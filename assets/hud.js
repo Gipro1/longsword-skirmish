@@ -13,6 +13,8 @@ import { equippedWeapon } from "./weapons.js";
 
 const svgNS = "http://www.w3.org/2000/svg";
 
+// Primary color for HUD elements
+let HUDColor = "lightblue";
 
 /**
  * - Formats gameTime into string with minutes, seconds, and milliseconds.
@@ -52,24 +54,45 @@ export function displayTime() {
 }
 
 
-let hp;
+let hitDetected = false;
+// Longsword health displayed in top right.
+export let hp;
 /**
- * 
+ * - Displays HP gauge in the top right corner.
+ * - Called by startGame() and intro(), sits within gameTimer interval,
+ * called ever 10 milliseconds.
  * 
  */
 export function displayHP() {
     if (hp) {
         hp.remove();
     }
+
     hp = document.createElementNS(svgNS, "text");
     hp.setAttribute("x", "930");
     hp.setAttribute("y", "25");
     hp.setAttribute("font-family", "Arial");
-    hp.setAttribute("fill", "orange");
+    hp.setAttribute("fill", `${HUDColor}`);
     hp.setAttribute("font-size", "20");
     svg.appendChild(hp);
-    hp.innerHTML = stats.hp;    
+    hp.innerHTML = stats.hp;        
 }
+
+
+/**
+ * - Called by takeDamaga() within longsword.js.
+ * - Causes HP gauge to flash red upon taking damage. 
+ * 
+ */
+export function hitDetectHP() {
+    hitDetected = true;
+    HUDColor = "red";
+    setTimeout(()=>{
+        HUDColor = "lightblue";
+    }, 100);
+    hitDetected = false;
+}
+
 
 
 /**
@@ -90,7 +113,7 @@ export function displayWeapon(equippedWeapon) {
         missileIconA1.setAttribute("width", "10");
         missileIconA1.setAttribute("height", "30");
         missileIconA1.setAttribute("ry", "10");
-        missileIconA1.setAttribute("fill", "orange");
+        missileIconA1.setAttribute("fill", `${HUDColor}`);
         missileIconA1.setAttribute("stroke", "black");
         weaponSpace.appendChild(missileIconA1);
         
@@ -99,7 +122,7 @@ export function displayWeapon(equippedWeapon) {
         missileIconB1.setAttribute("y", "25");
         missileIconB1.setAttribute("width", "10");
         missileIconB1.setAttribute("height", "5");
-        missileIconB1.setAttribute("fill", "orange");
+        missileIconB1.setAttribute("fill", `${HUDColor}`);
         missileIconB1.setAttribute("stroke", "black");
         weaponSpace.appendChild(missileIconB1);
 
@@ -110,7 +133,7 @@ export function displayWeapon(equippedWeapon) {
         missileIconA2.setAttribute("width", "10");
         missileIconA2.setAttribute("height", "30");
         missileIconA2.setAttribute("ry", "10");
-        missileIconA2.setAttribute("fill", "orange");
+        missileIconA2.setAttribute("fill", `${HUDColor}`);
         missileIconA2.setAttribute("stroke", "black");
         weaponSpace.appendChild(missileIconA2);
         
@@ -119,7 +142,7 @@ export function displayWeapon(equippedWeapon) {
         missileIconB2.setAttribute("y", "25");
         missileIconB2.setAttribute("width", "10");
         missileIconB2.setAttribute("height", "5");
-        missileIconB2.setAttribute("fill", "orange");
+        missileIconB2.setAttribute("fill", `${HUDColor}`);
         missileIconB2.setAttribute("stroke", "black");
         weaponSpace.appendChild(missileIconB2);
     } 

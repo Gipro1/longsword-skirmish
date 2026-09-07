@@ -10,6 +10,7 @@
 import { gameTime, x, y, takeDamage } from "./longsword.js";
 import { randomXSpawn, ySpawn } from "./helpers.js";
 import { game } from "./main.js";
+import { plasmaImpact } from "./collisions.js";
 
 
 const svgNS = "http://www.w3.org/2000/svg";
@@ -77,7 +78,6 @@ export function spawnEnemy(typeName) {
         } else if (enemyObj.hp <= 0) {
             clearInterval(tick);
             removeEnemy(enemyObj, "killed");
-
         }
     }, 100);
 }
@@ -104,7 +104,8 @@ function removeEnemy(enemyObj, reason) {
 }
 
 /**
- * - Controls enemy spawns.
+ * - Determines enemy spawns.
+ * - Calls spawnEnemy() on recursive function loop.
  * 
  */
 let spawnTime = 6000;
@@ -124,7 +125,11 @@ export function spawner() {
 
         spawnEnemy(enemyType);
         if (spawnTime > 500) {
-            spawnTime -= 70;
+            if (spawnTime > 4500) {   
+                spawnTime -= 70;
+            } else {
+                spawnTime -= 140;
+            }
         }
         
         spawnTimeout = setTimeout(spawnLoop, spawnTime);
@@ -133,7 +138,10 @@ export function spawner() {
 }
 
 /**
- * -
+ * - Updates enemy crafts.
+ * - Banshees move downward continuously.
+ * - If Lonhsword crosses banshee's path, banshee starts shooting, calls blasters().
+ * - Phantoms move down until it is within vertical range of longsword and starts shooting towards player, calls blasters().
  * 
  * @param {*} enemyObj 
  */
@@ -181,7 +189,8 @@ function update(enemyObj) {
 }
 
 /**
- * - 
+ * - Called by update().
+ * - Handles weapon firing for enemy crafts.
  * 
  * @param {*} enemyObj 
  */
@@ -216,24 +225,26 @@ function blasters(enemyObj) {
 
         plasmaTravel = setInterval(()=>{
             plasmaY+=10;
-            plasma1.setAttribute("cy", plasmaY);
-            plasma2.setAttribute("cy", plasmaY);
-      
-            const hitX1 = (x1 >= x && x1 <= x + 70);
-            const hitX2 = (x2 >= x && x2 <= x + 70);
-            const hitY = (plasmaY >= y - 7 && plasmaY <= y +65);
-
-            // boundary check stops interval if above viewport
-            if (plasmaY > 550) {
-                plasma1.remove();
-                plasma2.remove();
+            if (plasma1 || plasma2) {
+                // Checks if plasma shots are not null. 
+                if (plasma1) {    
+                    plasma1.setAttribute("cy", plasmaY);
+                    // Checks if plasma shots impact player or go below canvas.
+                    if (plasmaImpact(plasma1, x1, plasmaY, x, y, enemyObj.type)) {
+                        plasma1 = null;
+                    }
+                }
+                if (plasma2) {  
+                    plasma2.setAttribute("cy", plasmaY);
+                    // Checks if plasma shots impact player or go below canvas.  
+                    if (plasmaImpact(plasma2, x2, plasmaY, x, y, enemyObj.type)) {
+                        plasma2 = null;
+                    }
+                }
+            } else if (!plasma1 && !plasma2) {
                 clearInterval(plasmaTravel);
-            } else if (hitX1 && hitX2 && hitY) {
-                plasma1.remove();
-                plasma2.remove();
-                clearInterval(plasmaTravel);
-                takeDamage(10);
             }
+    
         }, 16);
     } else if (enemyObj.type === "phantom") {
         const cannon = enemyObj.element.querySelector("#body_vertical");
@@ -270,17 +281,8 @@ function blasters(enemyObj) {
             plasmaCannon.setAttribute("cx", plasmaX);
             plasmaCannon.setAttribute("cy", plasmaY);
 
-            const hitX = (plasmaX >= x && plasmaX <= x + 70);
-            const hitY = (plasmaY >= y - 7 && plasmaY <= y +65);
-
-            // boundary check stops interval if above viewport
-            if (plasmaY > 550 || plasmaX > 1000 || plasmaX < 0) {
-                plasmaCannon.remove();
-                clearInterval(plasmaTravel);
-            } else if (hitX && hitY) {
-                plasmaCannon.remove();
-                clearInterval(plasmaTravel);
-                takeDamage(20);
+            if (plasmaImpact(plasmaCannon, plasmaX, plasmaY, x, y, enemyObj.type)) {
+                plasmaCannon = null;
             }
         }, 16);
     }

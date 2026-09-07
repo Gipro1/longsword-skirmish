@@ -19,56 +19,6 @@ const svgNS = "http://www.w3.org/2000/svg";
 export let powerUpCount = 0;
 export let regenHPCount = 0;
 
-
-/**
- * - 
- * 
- * @param {*} itemType 
- * @param {*} opperation 
- * @param {*} increment 
- */
-function itemDrop(itemType, opperation, increment) {
-    let yDrift;
-    let drift;
-    let item = document.createElementNS(svgNS, "circle");
-    let nodeX = randomXSpawn();
-    
-    let color;
-    let animClass;
-
-    if (itemType === "powerUp") {
-        color = "yellow";
-        animClass = "flashing";
-    } else if (itemType === "regenHP") {
-        color = "chartreuse";
-        animClass = "blinking";
-    }
-    item.setAttribute("cx", `${nodeX}`);
-    item.setAttribute("cy", `${ySpawn}`);
-    item.setAttribute("r", "5");
-    item.setAttribute("fill", `${color}`);
-    svg.appendChild(item);
-    item.classList.add(`${animClass}`);
-
-    yDrift = 0;
-    if (drift) { clearInterval(drift); }
-    drift = setInterval(()=>{
-        item.setAttribute("cy", yDrift);
-        yDrift++;
-        if (collectItem(nodeX, yDrift, x, y, `${itemType}`)) {
-            opperation;
-            increment;
-            item.remove();
-            clearInterval(drift);
-        }
-        if (yDrift > 550) {
-            item.remove();
-            clearInterval(drift);
-        }
-    }, 16);
-}
-
-
 /**
  * - Creates powerUp.
  * - Flashes yellow.
@@ -79,24 +29,20 @@ function itemDrop(itemType, opperation, increment) {
  */
 export function powerUp() {
     let powerUpSpawner = setInterval(()=>{
-        //let yDrift;
-        //let drift;
-        //let powerNode = document.createElementNS(svgNS, "circle");
-        //let nodeX = randomXSpawn();
+        let yDrift;
+        let drift;
+        let powerNode = document.createElementNS(svgNS, "circle");
+        let nodeX = randomXSpawn();
 
-        //powerNode.setAttribute("cx", `${nodeX}`);
-        //powerNode.setAttribute("cy", ySpawn);
-        //powerNode.setAttribute("r", "5");
-        //powerNode.setAttribute("fill", "yellow");
-        //svg.appendChild(powerNode);
-        //powerNode.classList.add("flashing");
+        powerNode.setAttribute("cx", `${nodeX}`);
+        powerNode.setAttribute("cy", ySpawn);
+        powerNode.setAttribute("r", "5");
+        powerNode.setAttribute("fill", "yellow");
+        svg.appendChild(powerNode);
+        powerNode.classList.add("flashing");
 
-        //yDrift = 0;
-        let opperation = stats.missileDamage *= 3;
-        let increment = powerUpCount++;
-        //if (drift) { clearInterval(drift); }
-        itemDrop("powerUp", opperation, increment);
-        /*
+        yDrift = 0;
+        if (drift) { clearInterval(drift); }
         drift = setInterval(()=>{
             powerNode.setAttribute("cy", yDrift);
             yDrift++;
@@ -111,7 +57,6 @@ export function powerUp() {
                 clearInterval(drift);
             }
         }, 16);
-        */
     }, 30000);
 }
 
@@ -127,24 +72,20 @@ export function powerUp() {
  */
 export function regenHP() {
     let regenSpawner = setInterval(()=>{
-        //let yDrift;
-        //let drift;
-        //let regenNode = document.createElementNS(svgNS, "circle");
-        //let nodeX = randomXSpawn();
+        let yDrift;
+        let drift;
+        let regenNode = document.createElementNS(svgNS, "circle");
+        let nodeX = randomXSpawn();
 
-        //regenNode.setAttribute("cx", `${nodeX}`);
-        //regenNode.setAttribute("cy", ySpawn);
-        //regenNode.setAttribute("r", "5");
-        //regenNode.setAttribute("fill", "chartreuse");
-        //svg.appendChild(regenNode);
-        //regenNode.classList.add("blinking");
+        regenNode.setAttribute("cx", `${nodeX}`);
+        regenNode.setAttribute("cy", ySpawn);
+        regenNode.setAttribute("r", "5");
+        regenNode.setAttribute("fill", "chartreuse");
+        svg.appendChild(regenNode);
+        regenNode.classList.add("blinking");
 
-        //yDrift = 0;
-        //if (drift) { clearInterval(drift); }
-        let opperation = stats.hp += 50;
-        let increment = regenHPCount++;
-        itemDrop("regenHP", opperation, increment);
-        /*
+        yDrift = 0;
+        if (drift) { clearInterval(drift); }
         drift = setInterval(()=>{
             regenNode.setAttribute("cy", yDrift);
             yDrift++;
@@ -159,7 +100,6 @@ export function regenHP() {
                 clearInterval(drift);
             }
         }, 16);
-        */
     }, 60000);
 }
 
