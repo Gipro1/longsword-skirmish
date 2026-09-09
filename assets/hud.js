@@ -94,6 +94,32 @@ export function hitDetectHP() {
 }
 
 
+let noAlt;
+/**
+ * - Called if no alternate weapon is available.
+ * - Displays message stating no alt weapon available.
+ * 
+ */
+export function noAltMsg() {
+    // If no alt weapon is available.
+    if (noAlt) {
+        noAlt.remove();
+    }
+    noAlt = document.createElementNS(svgNS, "text");
+    noAlt.setAttribute("x", "845");
+    noAlt.setAttribute("y", "435");
+    noAlt.setAttribute("font-family", "Arial");
+    noAlt.setAttribute("fill", "lightblue");
+    noAlt.setAttribute("font-size", "10");
+    noAlt.innerHTML = "No alt weapon!";
+    svg.appendChild(noAlt);
+    // Clears message after 2 seconds.
+    setTimeout(()=>{
+        noAlt.remove();
+    }, 1000);
+}
+
+
 let weaponSpace
 /**
  * - Displays equipped weapon icon in lower right corner.

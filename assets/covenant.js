@@ -21,6 +21,7 @@ export let enemies = [];
 export let passedThrough = 0;
 let enemyCount = 0;
 
+// EnemyType objects
 export const enemyTypes = {
     banshee: {
         templateId: "banshee", 
@@ -41,11 +42,13 @@ export const enemyTypes = {
 }
 
 /**
- * - 
+ * - Called from spawnLoop() embedded in spawner().
+ * - Spawns enemyType, adds enemy to enemies array.
+ * - Checks if enemy has travelled beyond canvas boundary or hp is below 0. 
  * 
  * @param {*} typeName 
  */
-export function spawnEnemy(typeName) {
+function spawnEnemy(typeName) {
     const cfg = enemyTypes[typeName];
     const template = document.getElementById(cfg.templateId);
     const startX = randomXSpawn();

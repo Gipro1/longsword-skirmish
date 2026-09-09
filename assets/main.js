@@ -8,7 +8,7 @@
 import { startGame, setDirection, setTilt, x, y, tiltString } from "./longsword.js";
 import { fireWeapon, setWeapon } from "./weapons.js";
 import { splashScreen } from "./splash&end.js";
-import { displayWeapon } from "./hud.js";
+import { displayWeapon, noAltMsg } from "./hud.js";
 
 // Start button
 export const btn = document.getElementById("btn");
@@ -140,8 +140,10 @@ document.addEventListener("keydown", (e) => {
 });
 
 
-
+// True when new weapon is collected.
 let weaponPick = false;
+// True when any alternate weapon is owned.
+let altWeaponOwned = false;
 /**
  * - Automatically switches equipped weapon to newly collected weapon.
  * 
@@ -151,16 +153,22 @@ export function setWeaponPick(pick) {
     weaponPick = pick;
     setWeapon();
     if (weaponPick) {
+        altWeaponOwned = true;
         weaponPick = false;
     }
 }
+
 
 // Event Listener takes keyup inputs for weapon switching
 document.addEventListener("keydown", (e) => {
     if (!game) { return; }
     if (e.key === "ArrowDown") { 
         e.preventDefault();
-        setWeapon();
+        if (!altWeaponOwned) {
+            noAltMsg();
+        } else {
+            setWeapon();
+        }
         return;
     }
 });
