@@ -10,14 +10,17 @@
  */
 
 
+import { setWeaponPick } from "./main.js";
 import { randomXSpawn, ySpawn } from "./helpers.js";
 import { svg, x, y, stats } from "./longsword.js";
 import { collectItem } from "./collisions.js";
+import { addWeapons } from "./weapons.js";
 
 const svgNS = "http://www.w3.org/2000/svg";
 
 export let powerUpCount = 0;
 export let regenHPCount = 0;
+export let weaponDropCount = 0;
 
 
 /**
@@ -33,6 +36,9 @@ function itemDrop(itemType, opperation, increment) {
     let item = document.createElementNS(svgNS, "circle");
     let nodeX = randomXSpawn();
     
+    let itemA;
+    let itemB;
+
     let color;
     let animClass;
 
@@ -42,6 +48,9 @@ function itemDrop(itemType, opperation, increment) {
     } else if (itemType === "regenHP") {
         color = "chartreuse";
         animClass = "blinking";
+    } else if (itemType === "weaponDrop") {
+        color = "orange";
+        animClass = "shining";
     }
     item.setAttribute("cx", `${nodeX}`);
     item.setAttribute("cy", `${ySpawn}`);
@@ -50,14 +59,13 @@ function itemDrop(itemType, opperation, increment) {
     svg.appendChild(item);
     item.classList.add(`${animClass}`);
 
-    yDrift = 0;
+    yDrift = ySpawn;
     if (drift) { clearInterval(drift); }
     drift = setInterval(()=>{
         item.setAttribute("cy", yDrift);
         yDrift++;
         if (collectItem(nodeX, yDrift, x, y, `${itemType}`)) {
-            opperation;
-            increment;
+            opperation();
             item.remove();
             clearInterval(drift);
         }
@@ -79,39 +87,7 @@ function itemDrop(itemType, opperation, increment) {
  */
 export function powerUp() {
     let powerUpSpawner = setInterval(()=>{
-        //let yDrift;
-        //let drift;
-        //let powerNode = document.createElementNS(svgNS, "circle");
-        //let nodeX = randomXSpawn();
-
-        //powerNode.setAttribute("cx", `${nodeX}`);
-        //powerNode.setAttribute("cy", ySpawn);
-        //powerNode.setAttribute("r", "5");
-        //powerNode.setAttribute("fill", "yellow");
-        //svg.appendChild(powerNode);
-        //powerNode.classList.add("flashing");
-
-        //yDrift = 0;
-        let opperation = stats.missileDamage *= 3;
-        let increment = powerUpCount++;
-        //if (drift) { clearInterval(drift); }
-        itemDrop("powerUp", opperation, increment);
-        /*
-        drift = setInterval(()=>{
-            powerNode.setAttribute("cy", yDrift);
-            yDrift++;
-            if (collectItem(nodeX, yDrift, x, y, "powerUp")) {
-                stats.missileDamage *= 3;
-                powerUpCount++;
-                powerNode.remove();
-                clearInterval(drift);
-            }
-            if (yDrift > 550) {
-                powerNode.remove();
-                clearInterval(drift);
-            }
-        }, 16);
-        */
+        itemDrop("powerUp", () => { stats.missileDamage *= 3; powerUpCount++; });
     }, 30000);
 }
 
@@ -127,44 +103,12 @@ export function powerUp() {
  */
 export function regenHP() {
     let regenSpawner = setInterval(()=>{
-        //let yDrift;
-        //let drift;
-        //let regenNode = document.createElementNS(svgNS, "circle");
-        //let nodeX = randomXSpawn();
-
-        //regenNode.setAttribute("cx", `${nodeX}`);
-        //regenNode.setAttribute("cy", ySpawn);
-        //regenNode.setAttribute("r", "5");
-        //regenNode.setAttribute("fill", "chartreuse");
-        //svg.appendChild(regenNode);
-        //regenNode.classList.add("blinking");
-
-        //yDrift = 0;
-        //if (drift) { clearInterval(drift); }
-        let opperation = stats.hp += 50;
-        let increment = regenHPCount++;
-        itemDrop("regenHP", opperation, increment);
-        /*
-        drift = setInterval(()=>{
-            regenNode.setAttribute("cy", yDrift);
-            yDrift++;
-            if (collectItem(nodeX, yDrift, x, y, "regenHP")) {
-                stats.hp += 50;
-                regenHPCount++;
-                regenNode.remove();
-                clearInterval(drift);
-            }
-            if (yDrift > 550) {
-                regenNode.remove();
-                clearInterval(drift);
-            }
-        }, 16);
-        */
+        itemDrop("regenHP", () => { stats.hp += 50; regenHPCount++; });
     }, 60000);
 }
 
 
-
+let newWeapons = ["quadMissiles"];
 /**
  * - Creates Fenris nuke.
  * - Pulses red.
@@ -172,38 +116,67 @@ export function regenHP() {
  * - Loop recreates Fenris on interval.
  * 
  */
-/*
-export function fenrisNuke() {
-
-    let yDrift;
-    let drift;
-    let nodeSpawner = setInterval(()=>{
-        let fenrisNode = document.createElementNS(svgNS, "circle");
-        let nodeX = randomXSpawn();
-
-        fenrisNode.setAttribute("cx", `${nodeX}`);
-        fenrisNode.setAttribute("cy", ySpawn);
-        fenrisNode.setAttribute("r", "2");
-        fenrisNode.setAttribute("fill", "red");
-        svg.appendChild(fenrisNode);
-        fenrisNode.classList.add("flashing");
-
-        yDrift = 0;
-        if (drift) { clearInterval(drift); }
-        drift = setInterval(()=>{
-            fenrisNode.setAttribute("cy", yDrift);
-            yDrift++;
-            if (collectItem(nodeX, yDrift, x, y)) {
-                
-                fenrisNode.remove();
-                clearInterval(drift);
-            }
-            if (yDrift > 550) {
-                fenrisNode.remove();
-                clearInterval(drift);
-            }
-        }, 16);
-    }, 10000);
+export function weaponDrop() {
+    let nodeSpawner = setTimeout(()=>{
+        itemDrop("weaponDrop", () => { 
+            addWeapons(newWeapons[0]); 
+            weaponDropCount++; 
+            setWeaponPick(true); 
+            flashSwitchKey(); });
+    }, 170000);
 }
 
-*/
+
+/**
+ * - If weaponDrop is collected, flashSwitchKey will flash ArrowDown key
+ * instructing user how to switch weapons.
+ * 
+ */
+function flashSwitchKey() {
+    let flashes = 0;
+
+    let flashGroup = document.createElementNS(svgNS, "g");
+    svg.appendChild(flashGroup);
+
+    // Down arrow
+    let switching = document.createElementNS(svgNS, "text");
+    switching.setAttribute("x", "715");
+    switching.setAttribute("y", "266");
+    switching.setAttribute("font-family", "Arial");
+    switching.setAttribute("fill", "lightblue");
+    switching.setAttribute("font-size", "20");
+    switching.innerHTML = "Switch Weapons";
+    flashGroup.appendChild(switching);
+    
+    let downArrowKey = document.createElementNS(svgNS, "rect");
+    downArrowKey.setAttribute("x", "765");
+    downArrowKey.setAttribute("y", "295");
+    downArrowKey.setAttribute("width", "50");
+    downArrowKey.setAttribute("height", "50");
+    downArrowKey.setAttribute("rx", "10");
+    downArrowKey.setAttribute("ry", "10");
+    downArrowKey.setAttribute("stroke", "lightblue");
+    downArrowKey.setAttribute("stroke-width", "2");
+    flashGroup.appendChild(downArrowKey);
+
+    let downArrow = document.createElementNS(svgNS, "polygon");
+    downArrow.setAttribute("points", "777,320 772,312 777,312 777,302 777,312 782,312 777,320");
+    downArrow.setAttribute("stroke", "lightblue");
+    downArrow.setAttribute("fill", "lightblue");
+    downArrow.setAttribute("stroke-width", "2");
+    flashGroup.appendChild(downArrow);
+
+    let flashing = setInterval(()=>{
+        flashGroup.style.display = "none";
+        setTimeout(()=>{
+            flashGroup.style.display = "";
+        }, 200);
+    
+        flashes++;
+
+        if (flashes >= 5) {
+            clearInterval(flashing);
+            flashGroup.remove();
+        }
+    }, 600);
+}

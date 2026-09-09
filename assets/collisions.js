@@ -52,6 +52,9 @@ export function collectItem(nodeX, yDrift, x, y, item) {
         } else if (item === "regenHP") {
             flashColor = "chartreuse";
             pickUpMsg = "HP +";
+        } else if (item === "weaponDrop") {
+            flashColor = "orange";
+            pickUpMsg = "WPN +"
         }
         lsParts.forEach(part => part.setAttribute("fill", `${flashColor}`)); // Longsword flashes item color.
         if (pickUp) {

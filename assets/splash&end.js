@@ -196,7 +196,54 @@ export function splashScreen() {
             rightArrow.setAttribute("fill", "lightblue");
             rightArrow.setAttribute("stroke-width", "2");
             splash.appendChild(rightArrow);
+
+            // Down arrow
+            let switching = document.createElementNS(svgNS, "text");
+            switching.setAttribute("x", "715");
+            switching.setAttribute("y", "266");
+            switching.setAttribute("font-family", "Arial");
+            switching.setAttribute("fill", "lightblue");
+            switching.setAttribute("font-size", "20");
+            switching.innerHTML = "Switch Weapons";
+            splash.appendChild(switching);
             
+            let downArrowKey = document.createElementNS(svgNS, "rect");
+            downArrowKey.setAttribute("x", "765");
+            downArrowKey.setAttribute("y", "295");
+            downArrowKey.setAttribute("width", "50");
+            downArrowKey.setAttribute("height", "50");
+            downArrowKey.setAttribute("rx", "10");
+            downArrowKey.setAttribute("ry", "10");
+            downArrowKey.setAttribute("stroke", "lightblue");
+            downArrowKey.setAttribute("stroke-width", "2");
+            splash.appendChild(downArrowKey);
+
+            let downArrow = document.createElementNS(svgNS, "polygon");
+            downArrow.setAttribute("points", "777,320 772,312 777,312 777,302 777,312 782,312 777,320");
+            downArrow.setAttribute("stroke", "lightblue");
+            downArrow.setAttribute("fill", "lightblue");
+            downArrow.setAttribute("stroke-width", "2");
+            splash.appendChild(downArrow);
+
+
+            // Splash messages
+            let objective = document.createElementNS(svgNS, "text");
+            objective.setAttribute("x", "690");
+            objective.setAttribute("y", "410");
+            objective.setAttribute("font-family", "Arial");
+            objective.setAttribute("fill", "lightblue");
+            objective.setAttribute("font-size", "15");
+            objective.innerHTML = "Objective: Survive 5 minutes.";
+            splash.appendChild(objective);
+
+            let tip = document.createElementNS(svgNS, "text");
+            tip.setAttribute("x", "690");
+            tip.setAttribute("y", "450");
+            tip.setAttribute("font-family", "Arial");
+            tip.setAttribute("fill", "lightblue");
+            tip.setAttribute("font-size", "15");
+            tip.innerHTML = "Tip: Collect falling objects.";
+            splash.appendChild(tip);
 }
 
 /**

@@ -71,22 +71,6 @@ document.addEventListener("keydown", (e) => {
 });
 
 
-
-/**
- * - Event listeners for weapon selection and firing.
- * 
- */
-
-const cycleWeapons = ["ArrowUp", "ArrowDown"];
-
-// Event Listener for weapon icon display in HUD
-/*
-document.addEventListener("keydown", (e) =>{
-    
-});
-*/
-
-
 let firing = false;
 let firingInterval = null;
 
@@ -152,5 +136,31 @@ document.addEventListener("keydown", (e) => {
     if (tiltKeys.includes(e.key)) { 
         e.preventDefault();
         setTilt(e.key, true);
+    }
+});
+
+
+
+let weaponPick = false;
+/**
+ * - Automatically switches equipped weapon to newly collected weapon.
+ * 
+ * @param {*} pick 
+ */
+export function setWeaponPick(pick) {
+    weaponPick = pick;
+    setWeapon();
+    if (weaponPick) {
+        weaponPick = false;
+    }
+}
+
+// Event Listener takes keyup inputs for weapon switching
+document.addEventListener("keydown", (e) => {
+    if (!game) { return; }
+    if (e.key === "ArrowDown") { 
+        e.preventDefault();
+        setWeapon();
+        return;
     }
 });

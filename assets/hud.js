@@ -94,20 +94,48 @@ export function hitDetectHP() {
 }
 
 
-
+let weaponSpace
 /**
  * - Displays equipped weapon icon in lower right corner.
  * 
  * @param {*} equippedWeapon 
  */
 export function displayWeapon(equippedWeapon) {
-    let weaponSpace = document.createElementNS(svgNS, "g");
-    weaponSpace.setAttribute("transform", "translate(900,450)");
+    if (weaponSpace) {
+        svg.removeChild(weaponSpace);
+    }
+    weaponSpace = document.createElementNS(svgNS, "g");
+    weaponSpace.setAttribute("transform", "translate(850,450)");
     svg.appendChild(weaponSpace);
+
+    let missileIconA1;
+    let missileIconB1;
+    if (missileIconA1) {
+        weaponSpace.removeChild(missileIconA1);
+        weaponSpace.removeChild(missileIconB1);
+    }
+    let missileIconA2;
+    let missileIconB2;
+    if (missileIconA2) {
+        weaponSpace.removeChild(missileIconA2);
+        weaponSpace.removeChild(missileIconB2);
+    }
+    let missileIconA3;
+    let missileIconB3;
+    if (missileIconA3) {
+        weaponSpace.removeChild(missileIconA3);
+        weaponSpace.removeChild(missileIconB3);
+    }
+    let missileIconA4;
+    let missileIconB4;
+    if (missileIconA4) {
+        weaponSpace.removeChild(missileIconA4);
+        weaponSpace.removeChild(missileIconB4);
+    }
 
     if (equippedWeapon === "missiles") {
         // Missile 1
-        let missileIconA1 = document.createElementNS(svgNS, "rect");
+        missileIconA1 = document.createElementNS(svgNS, "rect");
         missileIconA1.setAttribute("x", "0");
         missileIconA1.setAttribute("y", "0");
         missileIconA1.setAttribute("width", "10");
@@ -117,7 +145,7 @@ export function displayWeapon(equippedWeapon) {
         missileIconA1.setAttribute("stroke", "black");
         weaponSpace.appendChild(missileIconA1);
         
-        let missileIconB1 = document.createElementNS(svgNS, "rect");
+        missileIconB1 = document.createElementNS(svgNS, "rect");
         missileIconB1.setAttribute("x", "0");
         missileIconB1.setAttribute("y", "25");
         missileIconB1.setAttribute("width", "10");
@@ -127,7 +155,7 @@ export function displayWeapon(equippedWeapon) {
         weaponSpace.appendChild(missileIconB1);
 
         // Missile 2
-        let missileIconA2 = document.createElementNS(svgNS, "rect");
+        missileIconA2 = document.createElementNS(svgNS, "rect");
         missileIconA2.setAttribute("x", "40");
         missileIconA2.setAttribute("y", "0");
         missileIconA2.setAttribute("width", "10");
@@ -137,7 +165,7 @@ export function displayWeapon(equippedWeapon) {
         missileIconA2.setAttribute("stroke", "black");
         weaponSpace.appendChild(missileIconA2);
         
-        let missileIconB2 = document.createElementNS(svgNS, "rect");
+        missileIconB2 = document.createElementNS(svgNS, "rect");
         missileIconB2.setAttribute("x", "40");
         missileIconB2.setAttribute("y", "25");
         missileIconB2.setAttribute("width", "10");
@@ -145,5 +173,87 @@ export function displayWeapon(equippedWeapon) {
         missileIconB2.setAttribute("fill", `${HUDColor}`);
         missileIconB2.setAttribute("stroke", "black");
         weaponSpace.appendChild(missileIconB2);
-    } 
+
+
+    } else if (equippedWeapon === "quadMissiles") {
+        // Missile 1
+        missileIconA1 = document.createElementNS(svgNS, "rect");
+        missileIconA1.setAttribute("x", "-40");
+        missileIconA1.setAttribute("y", "0");
+        missileIconA1.setAttribute("width", "10");
+        missileIconA1.setAttribute("height", "30");
+        missileIconA1.setAttribute("ry", "10");
+        missileIconA1.setAttribute("fill", `${HUDColor}`);
+        missileIconA1.setAttribute("stroke", "black");
+        weaponSpace.appendChild(missileIconA1);
+        
+        missileIconB1 = document.createElementNS(svgNS, "rect");
+        missileIconB1.setAttribute("x", "-40");
+        missileIconB1.setAttribute("y", "25");
+        missileIconB1.setAttribute("width", "10");
+        missileIconB1.setAttribute("height", "5");
+        missileIconB1.setAttribute("fill", `${HUDColor}`);
+        missileIconB1.setAttribute("stroke", "black");
+        weaponSpace.appendChild(missileIconB1);
+
+        // Missile 2
+        missileIconA2 = document.createElementNS(svgNS, "rect");
+        missileIconA2.setAttribute("x", "0");
+        missileIconA2.setAttribute("y", "0");
+        missileIconA2.setAttribute("width", "10");
+        missileIconA2.setAttribute("height", "30");
+        missileIconA2.setAttribute("ry", "10");
+        missileIconA2.setAttribute("fill", `${HUDColor}`);
+        missileIconA2.setAttribute("stroke", "black");
+        weaponSpace.appendChild(missileIconA2);
+        
+        missileIconB2 = document.createElementNS(svgNS, "rect");
+        missileIconB2.setAttribute("x", "0");
+        missileIconB2.setAttribute("y", "25");
+        missileIconB2.setAttribute("width", "10");
+        missileIconB2.setAttribute("height", "5");
+        missileIconB2.setAttribute("fill", `${HUDColor}`);
+        missileIconB2.setAttribute("stroke", "black");
+        weaponSpace.appendChild(missileIconB2);
+
+        // Missile 3
+        missileIconA3 = document.createElementNS(svgNS, "rect");
+        missileIconA3.setAttribute("x", "40");
+        missileIconA3.setAttribute("y", "0");
+        missileIconA3.setAttribute("width", "10");
+        missileIconA3.setAttribute("height", "30");
+        missileIconA3.setAttribute("ry", "10");
+        missileIconA3.setAttribute("fill", `${HUDColor}`);
+        missileIconA3.setAttribute("stroke", "black");
+        weaponSpace.appendChild(missileIconA3);
+        
+        missileIconB3 = document.createElementNS(svgNS, "rect");
+        missileIconB3.setAttribute("x", "40");
+        missileIconB3.setAttribute("y", "25");
+        missileIconB3.setAttribute("width", "10");
+        missileIconB3.setAttribute("height", "5");
+        missileIconB3.setAttribute("fill", `${HUDColor}`);
+        missileIconB3.setAttribute("stroke", "black");
+        weaponSpace.appendChild(missileIconB3);
+
+        // Missile 4
+        missileIconA4 = document.createElementNS(svgNS, "rect");
+        missileIconA4.setAttribute("x", "80");
+        missileIconA4.setAttribute("y", "0");
+        missileIconA4.setAttribute("width", "10");
+        missileIconA4.setAttribute("height", "30");
+        missileIconA4.setAttribute("ry", "10");
+        missileIconA4.setAttribute("fill", `${HUDColor}`);
+        missileIconA4.setAttribute("stroke", "black");
+        weaponSpace.appendChild(missileIconA4);
+        
+        missileIconB4 = document.createElementNS(svgNS, "rect");
+        missileIconB4.setAttribute("x", "80");
+        missileIconB4.setAttribute("y", "25");
+        missileIconB4.setAttribute("width", "10");
+        missileIconB4.setAttribute("height", "5");
+        missileIconB4.setAttribute("fill", `${HUDColor}`);
+        missileIconB4.setAttribute("stroke", "black");
+        weaponSpace.appendChild(missileIconB4); 
+    }
 }

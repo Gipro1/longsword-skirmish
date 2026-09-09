@@ -13,7 +13,7 @@ import { clearSplash, endGame } from "./splash&end.js";
 import { displayTime, displayHP, displayWeapon, hitDetectHP } from "./hud.js";
 import { hitDetection } from "./collisions.js";
 import { enemies, spawner, enemyTypes } from "./covenant.js";
-import { powerUp, regenHP } from "./items.js";
+import { powerUp, regenHP, weaponDrop } from "./items.js";
 import { equippedWeapon } from "./weapons.js";
 
 const svgNS = "http://www.w3.org/2000/svg";
@@ -135,6 +135,7 @@ function intro() {
         
         powerUp();
         regenHP();
+        weaponDrop();
     },2000);
 }
 
