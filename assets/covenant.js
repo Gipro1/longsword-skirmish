@@ -1,6 +1,6 @@
 /**
  * - Covenant controller
- * - Spawns banshees and phantoms on regular intervals.
+ * - Spawns banshees, spirits and spirits on regular intervals.
  * - Tracks takeDowns, passedThrough and enemyCount.
  * 
  * @author: Angelo Scala
@@ -15,7 +15,6 @@ import { plasmaImpact } from "./collisions.js";
 
 const svgNS = "http://www.w3.org/2000/svg";
 const svg = document.getElementById("mySVG");
-const banshee = document.getElementById("banshee");
 
 export let enemies = [];
 export let passedThrough = 0;
@@ -27,6 +26,14 @@ export const enemyTypes = {
         templateId: "banshee", 
         hp: 100,
         hitW: 55, hitH: 35, // hitbox
+        takeDowns: 0,
+        passedThrough: 0,
+        update: update
+    },
+    spirit: {
+        templateId: "spirit",
+        hp: 1000, 
+        hitW: 40, hitH: 73, // hitbox
         takeDowns: 0,
         passedThrough: 0,
         update: update
@@ -115,23 +122,23 @@ let spawnTime = 6000;
 let spawnTimeout;
 let enemyType;
 export function spawner() {
-    let lastPhantom = 0;
+    let lastSpirit = 0;
     function spawnLoop() {
         if (!game) { return; }
     
-        if (gameTime - lastPhantom >= 20) {
-            enemyType = "phantom";
-            lastPhantom = gameTime;
+        if (gameTime - lastSpirit >= 20) {
+            enemyType = "spirit";
+            lastSpirit = gameTime;
         } else {
             enemyType = "banshee";
         }
 
         spawnEnemy(enemyType);
-        if (spawnTime > 500) {
+        if (spawnTime > 800) {
             if (spawnTime > 4500) {   
                 spawnTime -= 70;
             } else {
-                spawnTime -= 140;
+                spawnTime -= 100;
             }
         }
         
@@ -144,7 +151,7 @@ export function spawner() {
  * - Updates enemy crafts.
  * - Banshees move downward continuously.
  * - If Lonhsword crosses banshee's path, banshee starts shooting, calls blasters().
- * - Phantoms move down until it is within vertical range of longsword and starts shooting towards player, calls blasters().
+ * - Spirit move down until it is within vertical range of longsword and starts shooting towards player, calls blasters().
  * 
  * @param {*} enemyObj 
  */
@@ -169,7 +176,7 @@ function update(enemyObj) {
             } 
         }
 
-    } else if (enemyObj.type === "phantom") {
+    } else if (enemyObj.type === "spirit") {
         if (enemyObj.y < y-300) {
             enemyObj.y += 2;
             
@@ -187,7 +194,7 @@ function update(enemyObj) {
                     blasters(enemyObj);
                 }, 1000);
             }
-        }   
+        }
     }
 }
 
@@ -249,8 +256,8 @@ function blasters(enemyObj) {
             }
     
         }, 16);
-    } else if (enemyObj.type === "phantom") {
-        const cannon = enemyObj.element.querySelector("#body_vertical");
+    } else if (enemyObj.type === "spirit") {
+        const cannon = enemyObj.element.querySelector("#midBack");
         const cannonBox = cannon.getBBox(); // getBBox retrives enemyUnit coords within <g> tag
 
         let plasmaX = enemyObj.x + cannonBox.x + cannonBox.width / 2;
@@ -266,6 +273,7 @@ function blasters(enemyObj) {
         plasmaCannon.setAttribute("stroke", "red");
         plasmaCannon.setAttribute("stroke-width", "2");
         plasmaCannon.setAttribute("fill", "yellow");
+        plasmaCannon.style.display = "none"; // Starts invisibile.
         svg.appendChild(plasmaCannon);
         let plasmaTravel;
 
@@ -279,6 +287,13 @@ function blasters(enemyObj) {
         const velocityY = (dy / dist) * speed;
 
         plasmaTravel = setInterval(()=>{
+
+            // PlasmaCannon not visible until it's passed spirit's elements. 
+            // Appears as though it comes from beneath spirit.
+            if (!(plasmaX < enemyObj.x + enemyObj.hitW && plasmaX > enemyObj.x && plasmaY < enemyObj.y + enemyObj.hitH && plasmaY > enemyObj.y)) {
+                plasmaCannon.style.display = "";
+            }
+
             plasmaX += velocityX;
             plasmaY += velocityY;
             plasmaCannon.setAttribute("cx", plasmaX);

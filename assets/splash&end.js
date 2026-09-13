@@ -312,7 +312,7 @@ export function endGame(gameVictory, gametime, enemyTypes) {
     endStats.appendChild(missedStatB);
     missedStatB.innerHTML = "Banshees missed: " + enemyTypes.banshee.passedThrough;
 
-    if (enemyTypes.phantom.takeDowns > 0) {
+    if (enemyTypes.spirit.takeDowns > 0) {
 
         let takeDownStatP = document.createElementNS(svgNS, "text");
         takeDownStatP.setAttribute("x", "400");
@@ -321,7 +321,7 @@ export function endGame(gameVictory, gametime, enemyTypes) {
         takeDownStatP.setAttribute("fill", "white");
         takeDownStatP.setAttribute("font-size", "20");
         endStats.appendChild(takeDownStatP);
-        takeDownStatP.innerHTML = "Phantom Takedowns: " + enemyTypes.phantom.takeDowns;
+        takeDownStatP.innerHTML = "Spirit Takedowns: " + enemyTypes.spirit.takeDowns;
         
         let missedStatP = document.createElementNS(svgNS, "text");
         missedStatP.setAttribute("x", "410");
@@ -330,6 +330,6 @@ export function endGame(gameVictory, gametime, enemyTypes) {
         missedStatP.setAttribute("fill", "white");
         missedStatP.setAttribute("font-size", "20");
         endStats.appendChild(missedStatP);
-        missedStatP.innerHTML = "Phantoms missed: " + enemyTypes.phantom.passedThrough;
+        missedStatP.innerHTML = "Spirit missed: " + enemyTypes.spirit.passedThrough;
     }
 }

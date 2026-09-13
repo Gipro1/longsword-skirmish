@@ -7,9 +7,7 @@
  * @author: Angelo Scala
  */
 
-import { game } from "./main.js";
-import { svg, gameTime, stats } from "./longsword.js";
-import { equippedWeapon } from "./weapons.js";
+import { svg, gameTime, stats, rocket } from "./longsword.js";
 
 const svgNS = "http://www.w3.org/2000/svg";
 
@@ -79,18 +77,75 @@ export function displayHP() {
 }
 
 
+let shieldColor = "orange";
+let shieldGaugeColor = "orange";
+/**
+ * - Called in Overshield function.
+ * - Flashes shieldGaugeColor yellow upon collection of overshield.
+ * 
+ */
+export function setShieldColor() {
+        shieldColor = "orange";
+        shieldGaugeColor = "yellow";
+    setTimeout(()=>{
+        shieldColor = "orange";
+        shieldGaugeColor = "orange";
+    }, 200);
+}
+
 /**
  * - Called by takeDamaga() within longsword.js.
+ * - Causes overshield on longsword to flash orangered upon taking damage.
  * - Causes HP gauge to flash red upon taking damage. 
  * 
  */
-export function hitDetectHP() {
+export function hitDetectStatus() {
     hitDetected = true;
-    HUDColor = "red";
+    
+    if (stats.shield > 0) {
+        shieldColor = "red";
+        shieldGaugeColor = "red";
+    } else {
+        HUDColor = "red";
+    }
+
     setTimeout(()=>{
         HUDColor = "lightblue";
+        shieldColor = "orange";
+        shieldGaugeColor = "orange";
     }, 100);
     hitDetected = false;
+}
+
+
+
+let shield;
+/**
+ * - When overshield > 0 displays Shield value next to HP.
+ * 
+ */
+export function displayShield() {
+    if (stats.shield > 0) {
+        if (shield) {
+            shield.remove();
+        }
+
+        shield = document.createElementNS(svgNS, "text");
+        shield.setAttribute("x", "850");
+        shield.setAttribute("y", "25");
+        shield.setAttribute("font-family", "Arial");
+        shield.setAttribute("fill", `${shieldGaugeColor}`);
+        shield.setAttribute("font-size", "20");
+        svg.appendChild(shield);
+        shield.innerHTML = stats.shield;
+
+        rocket.style.filter = `drop-shadow(20px -9px 7px ${shieldColor}) drop-shadow(-20px -9px 7px ${shieldColor})`;
+    } else {
+        if (shield) {
+            shield.remove();
+            rocket.style.filter = "";
+        }
+    }
 }
 
 

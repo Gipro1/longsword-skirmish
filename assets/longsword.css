@@ -89,6 +89,22 @@ svg {
     animation-iteration-count: infinite;
 }
 
+/* Overshield Animation */
+@keyframes glow {
+    0% { filter: drop-shadow(0px -4px 4px orangered) drop-shadow(3px 2px 4px orangered); fill:rgb(255, 178, 150); }
+    25% { filter: drop-shadow(1px -5px 5px orangered) drop-shadow(4px 3px 3px orangered); fill: rgb(255, 222, 210); }
+    50% { filter: drop-shadow(0px 0px 4px orangered) drop-shadow(2px 1px 1px orangered); }
+    75% { filter: drop-shadow(3px 1px 5px orangered) drop-shadow(1px -2px -4px orangered); }
+    100% { filter: drop-shadow(0px -3px 3px orangered) drop-shadow(2px 2px 3px orangered); fill: rgb(255, 149, 110)}
+}
+
+.glowing {
+    animation-name: glow;
+    animation-duration: 3s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+
 /* Fenris nuke Animation */
 @keyframes pulse {
     0% { scale: 1; }

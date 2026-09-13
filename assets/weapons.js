@@ -224,7 +224,7 @@ function missileFire(missileObj, missileTilt) {
         missileTick++;
 
         // Boundary check stops interval if above viewport.
-        if (currentY < 0 || currentX < 0 || currentX > 1000 || missileTick > 188) { // missileTick check removes missiles if they become frozen in view.
+        if (currentY < -50 || currentX < 0 || currentX > 1000 || missileTick > 188) { // missileTick check removes missiles if they become frozen in view.
             if (missileObj.missile) {
                 missileObj.missile.remove();
                 missileObj.missile = null;

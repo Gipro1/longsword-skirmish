@@ -10,10 +10,10 @@
 
 import { btn, start, game, setGame } from "./main.js";
 import { clearSplash, endGame } from "./splash&end.js";
-import { displayTime, displayHP, displayWeapon, hitDetectHP } from "./hud.js";
+import { displayTime, displayHP, displayWeapon, hitDetectStatus, displayShield } from "./hud.js";
 import { hitDetection } from "./collisions.js";
 import { enemies, spawner, enemyTypes } from "./covenant.js";
-import { powerUp, regenHP, weaponDrop } from "./items.js";
+import { deployItems } from "./items.js";
 import { equippedWeapon } from "./weapons.js";
 
 const svgNS = "http://www.w3.org/2000/svg";
@@ -25,11 +25,12 @@ export let gameVictory = false;
 export let timeLimit = 300.00;
 
 // Longsword
-const rocket = document.getElementById("rocket");
+export const rocket = document.getElementById("rocket");
 const flameLeft = document.getElementById("flameLeft");
 const flameRight = document.getElementById("flameRight");
 export const stats = {
     hp: 100,
+    shield: 0,
     missileDamage: 5
 };
 // Longsword rotation
@@ -124,6 +125,7 @@ function intro() {
             gameTime+=0.01;
             displayTime();
             displayHP();
+            displayShield();
             if (gameTime >= timeLimit) {
                 clearInterval(gameTimer);
                 gameVictory = true;
@@ -133,9 +135,7 @@ function intro() {
             }
         },10);
         
-        powerUp();
-        regenHP();
-        weaponDrop();
+        deployItems();
     },2000);
 }
 
@@ -252,6 +252,8 @@ export function setTilt(key, pressed) {
  * 
  */
 export function hpStatus() {
+    displayShield();
+    
     if (stats.hp <= 0) {
         stats.hp = 0;
         displayHP();
@@ -290,16 +292,28 @@ export function collision() {
  * @param {*} damage 
  */
 export function takeDamage(damage) {
+    if (stats.shield >= 0) {
+        stats.shield -= damage;
+    } else {
         stats.hp -= damage;
-        if (stats.hp < 0) {
-            stats.hp = 0;
-        }
-        hpStatus();
+    }
 
-        const lsParts = svg.querySelectorAll("#nose, #trunkLeft, #trunkRight, #leftWing, #rightWing, #leftEngine, #rightEngine, #tail"); 
-        lsParts.forEach(part => part.setAttribute("fill", "red"));
-        hitDetectHP();
+    if (stats.hp < 0) {
+        stats.hp = 0;
+    }
+    hpStatus();
+
+    const lsParts = svg.querySelectorAll("#nose, #trunkLeft, #trunkRight, #leftWing, #rightWing, #leftEngine, #rightEngine, #tail"); 
+    if (stats.shield > 0) {
+        rocket.style.filter = "drop-shadow(20px -9px 7px red), drop-shadow(-20px -9px 7px red)";
         setTimeout(()=>{
-            lsParts.forEach(part => part.setAttribute("fill", "lightgrey"));
+            rocket.style.filter = "drop-shadow(20px -9px 7px orange), drop-shadow(-20px -9px 7px orange)";
         }, 100);
+    } else {
+        lsParts.forEach(part => part.setAttribute("fill", "red"));
+    }
+    hitDetectStatus();
+    setTimeout(()=>{
+        lsParts.forEach(part => part.setAttribute("fill", "lightgrey"));
+    }, 100);
 }

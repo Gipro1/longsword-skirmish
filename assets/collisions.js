@@ -7,8 +7,9 @@
  */
 
 
-import { svg, stats as longsword, hpStatus, takeDamage } from "./longsword.js";
-import { enemies, spawner, enemyTypes } from "./covenant.js";
+import { hitDetectStatus } from "./hud.js";
+import { svg, stats as longsword, hpStatus, takeDamage, rocket } from "./longsword.js";
+
 
 const svgNS = "http://www.w3.org/2000/svg";
 
@@ -54,7 +55,10 @@ export function collectItem(nodeX, yDrift, x, y, item) {
             pickUpMsg = "HP +";
         } else if (item === "weaponDrop") {
             flashColor = "orange";
-            pickUpMsg = "WPN +"
+            pickUpMsg = "WPN +";
+        } else if (item === "overshield") {
+            flashColor = "gold";
+            pickUpMsg = "SH +";
         }
         lsParts.forEach(part => part.setAttribute("fill", `${flashColor}`)); // Longsword flashes item color.
         if (pickUp) {
@@ -118,19 +122,24 @@ export function hitDetection(hitX, hitY, enemy, hitType) {
             sD = "lightblue"; fD = "lightblue";
             sC = "indigo"; fC = "indigo";
 
-        // Flashes phantom color change to indicate damage taken
-        } else if (enemy.type === "phantom") {
-            eBody = enemy.element.querySelectorAll("#body_horizontal_rear, #body_horizontal_front, #left_spike, #right_spike, #mid_spike, #body_left_rear, #body_right_rear, #body_left, #body_right, #body_horizontal_cover, #body_vertical");
-            sD = "lightblue"; fD = "red";
-            sC = "#702963"; fC = "#34132E";
+        // Flashes spirit color change to indicate damage taken
+        } else if (enemy.type === "spirit") {
+            // for phantom eBody = enemy.element.querySelectorAll("#body_horizontal_rear, #body_horizontal_front, #left_spike, #right_spike, #mid_spike, #body_left_rear, #body_right_rear, #body_left, #body_right, #body_horizontal_cover, #body_vertical");
+            eBody = enemy.element.querySelectorAll("#mid, #leftArm, #rightArm, #midBack, #midTop");
+            sD = "red"; fD = "pink";
+            sC = "indigo"; fC = "purple"; // for phantom 702963 34132E
         }
         
 
         // Reduces hp and flashes colors based on hitType
         if (hitType === "collision") {    
-            longsword.hp-=10;
+            //longsword.hp-=10; // why is this here???
+            hitDetectStatus();
             hpStatus();
-            lsParts.forEach(part => part.setAttribute("fill", "red"));
+            if (longsword.shield <= 0) {
+                lsParts.forEach(part => part.setAttribute("fill", "red"));
+            }
+            
             enemy.impact = true;
             enemy.hp -= 25;
         } else if (hitType === "missileImpact") {
@@ -144,7 +153,9 @@ export function hitDetection(hitX, hitY, enemy, hitType) {
 
         // Resets to normal colors after flash
         setTimeout(() => {
-            lsParts.forEach(part => part.setAttribute("fill", "lightgrey"));
+            if (longsword.shield <= 0) {
+                lsParts.forEach(part => part.setAttribute("fill", "lightgrey"));
+            }
             eBody.forEach(part => part.setAttribute("fill", fC));    
             if (eJets) {
                 eJets.forEach(part => part.setAttribute("stroke", sC));    
@@ -180,7 +191,7 @@ export function plasmaImpact(plasmaFire, plasmaX, plasmaY, x, y, enemy) {
         plasmaFire.remove();
         if (enemy === "banshee") {
             takeDamage(5);
-        } else if (enemy === "phantom") {
+        } else if (enemy === "spirit") {
             takeDamage(20);
         }
         return true;

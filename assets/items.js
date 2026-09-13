@@ -2,7 +2,8 @@
  * - Controls collectible spawns and tracks collection.
  * - PowerUp multiplies missile damage when collected.
  * - RegenHP restores longsword hp.
- * - Armament adds firing modes. // pending
+ * - WeaponDrop adds firing modes.
+ * - Overshield adds shielding to longsword.
  * - Fenris adds nuke. // pending
  * - TimeExtend adds 60 seconds to game's time limit. // pending
  * 
@@ -15,12 +16,14 @@ import { randomXSpawn, ySpawn } from "./helpers.js";
 import { svg, x, y, stats } from "./longsword.js";
 import { collectItem } from "./collisions.js";
 import { addWeapons } from "./weapons.js";
+import { setShieldColor } from "./hud.js";
 
 const svgNS = "http://www.w3.org/2000/svg";
 
 export let powerUpCount = 0;
 export let regenHPCount = 0;
 export let weaponDropCount = 0;
+export let overshieldCount = 0;
 
 
 /**
@@ -35,11 +38,10 @@ function itemDrop(itemType, opperation, increment) {
     let drift;
     let item = document.createElementNS(svgNS, "circle");
     let nodeX = randomXSpawn();
-    
-    let itemA;
-    let itemB;
 
+    // color of fallng object
     let color;
+    // animation class assigned to object based on item type
     let animClass;
 
     if (itemType === "powerUp") {
@@ -51,6 +53,9 @@ function itemDrop(itemType, opperation, increment) {
     } else if (itemType === "weaponDrop") {
         color = "orange";
         animClass = "shining";
+    } else if (itemType === "overshield") {
+        color = "orangered";
+        animClass = "glowing";
     }
     item.setAttribute("cx", `${nodeX}`);
     item.setAttribute("cy", `${ySpawn}`);
@@ -78,6 +83,18 @@ function itemDrop(itemType, opperation, increment) {
 
 
 /**
+ * - Calls each itemDrop function to begin their intervals.
+ * 
+ */
+export function deployItems() {
+    powerUp(); // drops every 30 seconds
+    regenHP(); // drops every 60 seconds
+    weaponDrop(); // drops every 170 seconds
+    overshield(); // drops every 120 seconds
+}
+
+
+/**
  * - Creates powerUp.
  * - Flashes yellow.
  * - Travels down screen until it passes lower boundary or is collected.
@@ -98,12 +115,19 @@ export function powerUp() {
  * - Flashes green.
  * - Travels down screen until it passes lower boundary or is collected.
  * - Loop recreates regenHP on interval.
- * - Regenerates and adds to longsword hp.
+ * - Regenerates and adds to longsword hp. Capped at 100.
  * 
  */
 export function regenHP() {
     let regenSpawner = setInterval(()=>{
-        itemDrop("regenHP", () => { stats.hp += 50; regenHPCount++; });
+        itemDrop("regenHP", () => { 
+            if (stats.hp > 50) {
+                stats.hp += (100-stats.hp);
+            } else {
+                stats.hp += 50;
+            } 
+            regenHPCount++; 
+        });
     }, 60000);
 }
 
@@ -174,9 +198,20 @@ function flashSwitchKey() {
     
         flashes++;
 
-        if (flashes >= 5) {
+        if (flashes >= 10) {
             clearInterval(flashing);
             flashGroup.remove();
         }
     }, 600);
 }
+
+
+/**
+ * - Overshield drops every 2 minutes.
+ * 
+ */
+export function overshield() {
+    let overshieldSpawner = setInterval(()=>{
+        itemDrop("overshield", () => { stats.shield += 100-stats.shield; setShieldColor(); overshieldCount++; });
+    }, 140000);
+}   
